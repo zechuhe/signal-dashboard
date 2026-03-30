@@ -245,11 +245,29 @@ proj_147_stock_signal_dashboard/
 
 **存儲**：localStorage + JSON 匯出按鈕。CEO 定期匯出上傳 GitHub 即可更新。
 
-### 9.3 P2 不做的
+### 9.3 事件圖層開關（P2.2 — 用戶反饋 #2）
+
+- Legend 改為可點擊 checkbox，按 category 勾選顯示/隱藏
+- 預設全開，用戶可只看特定類型（如只看「私人消息」+「企業公告」）
+
+### 9.4 事件編輯/刪除 + 事件列表（P2.2 — 用戶反饋 #3）
+
+- 圖表下方或側邊新增事件列表 Panel（按時間排序）
+- 每筆事件有「編輯」「刪除」按鈕
+- 編輯：重新打開表單 Modal，預填現有值
+- 刪除：確認後移除（localStorage 同步更新）
+
+### 9.5 編輯 LOG（P2.2 — 用戶反饋 #1）
+
+- localStorage 記錄每次操作：`{ action: "create|edit|delete", event_id, timestamp, changes }`
+- 匯出 JSON 時一併包含 edit log
+
+### 9.6 P2 不做的
 
 - 不做公開訊息輸入（那是 P3 自動撈的事）
 - 不做後端（純前端 + 靜態 JSON）
 - 不做即時股價（仍用 yfinance 預拉取）
+- 不做搜尋/篩選（P3）、不做已驗證標記（P4）
 
 ---
 

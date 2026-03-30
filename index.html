@@ -151,18 +151,57 @@ body {
 }
 .overlay.open { opacity: 1; pointer-events: all; }
 
-/* ===== Category Legend ===== */
+/* ===== Category Filter (replaces legend) ===== */
 .legend {
-  display: flex; gap: 16px; padding: 8px 20px;
-  flex-wrap: wrap;
+  display: flex; gap: 12px; padding: 8px 20px;
+  flex-wrap: wrap; align-items: center;
 }
 .legend-item {
   display: flex; align-items: center; gap: 4px;
   font-size: 12px; color: var(--text-secondary);
+  cursor: pointer; user-select: none; transition: opacity 0.15s;
 }
+.legend-item.off { opacity: 0.35; }
+.legend-item input { accent-color: var(--accent); cursor: pointer; }
 .legend-dot {
   width: 8px; height: 8px; border-radius: 50%;
 }
+
+/* ===== Event List Panel ===== */
+.event-list-toggle {
+  padding: 4px 20px; font-size: 12px;
+}
+.event-list-panel {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  background: var(--panel-bg); border-top: 1px solid var(--border);
+}
+.event-list-panel.open { max-height: 300px; overflow-y: auto; }
+.event-list-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.event-list-table th {
+  position: sticky; top: 0; background: var(--panel-bg);
+  text-align: left; padding: 6px 12px;
+  color: var(--text-secondary); font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+.event-list-table td {
+  padding: 5px 12px; border-bottom: 1px solid var(--grid-line);
+  color: var(--text-primary); vertical-align: middle;
+}
+.event-list-table tr:hover { background: rgba(59,130,246,0.05); }
+.evt-cat-dot {
+  display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; margin-right: 4px; vertical-align: middle;
+}
+.btn-xs {
+  padding: 2px 8px; font-size: 11px; border-radius: 3px;
+  cursor: pointer; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.btn-xs:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.btn-xs.btn-danger:hover { color: var(--up-color); border-color: var(--up-color); }
 
 /* ===== Footer ===== */
 .footer {
@@ -281,6 +320,16 @@ body {
 </div>
 
 <div id="chart-container"></div>
+
+<div class="event-list-toggle">
+  <button class="btn" onclick="toggleEventList()" id="evtListBtn">顯示事件列表</button>
+</div>
+<div class="event-list-panel" id="eventListPanel">
+  <table class="event-list-table">
+    <thead><tr><th>日期</th><th>分類</th><th>標題</th><th>影響</th><th>信心</th><th>來源</th><th>操作</th></tr></thead>
+    <tbody id="eventListBody"></tbody>
+  </table>
+</div>
 
 <div class="footer">
   Data source: Yahoo Finance (yfinance) | 事件資料僅供分析研究用途 |
@@ -417,10 +466,16 @@ async function init() {
   updateUserEventCount();
 }
 
+let activeCategories = new Set();
+
 function buildLegend(categories) {
+  activeCategories = new Set(Object.keys(categories));
   const el = document.getElementById('legend');
   el.innerHTML = Object.entries(categories).map(([k, v]) =>
-    `<div class="legend-item"><span class="legend-dot" style="background:${v.color}"></span>${v.label}</div>`
+    `<label class="legend-item" data-cat="${k}">
+      <input type="checkbox" checked onchange="toggleCategory('${k}', this.checked)">
+      <span class="legend-dot" style="background:${v.color}"></span>${v.label}
+    </label>`
   ).join('');
 }
 
@@ -532,11 +587,12 @@ function renderChart(caseData, priceData) {
   const ma20 = computeMA(closes, 20);
   const ma60 = computeMA(closes, 60);
 
-  // Event markers (merge user events)
+  // Event markers (merge user events + filter by active categories)
   const mergedEvents = getMergedEvents(caseData);
+  const filteredEvents = mergedEvents.filter(e => activeCategories.has(e.category));
   const eventMarkers = [];
   const eventLines = [];
-  mergedEvents.forEach(evt => {
+  filteredEvents.forEach(evt => {
     const idx = dates.indexOf(evt.date);
     const catInfo = CATEGORY_COLORS[evt.category] || { color: '#FF9500', label: evt.category };
 
@@ -641,7 +697,7 @@ function renderChart(caseData, priceData) {
         const sign = d.change >= 0 ? '+' : '';
 
         let evtHtml = '';
-        const evtsOnDate = mergedEvents.filter(e => {
+        const evtsOnDate = filteredEvents.filter(e => {
           const eidx = dates.indexOf(e.date);
           const nidx = findNearestDate(dates, e.date);
           return eidx === idx || nidx === idx;
@@ -827,6 +883,9 @@ function renderChart(caseData, priceData) {
       openEventPanel(params.data._eventData);
     }
   });
+
+  // Build event list
+  buildEventList(caseData);
 }
 
 // ===== Helpers =====
@@ -1053,6 +1112,194 @@ function getMergedEvents(caseData) {
   );
   return [...caseData.events, ...relevantUserEvents];
 }
+
+// ===== Category Filter =====
+function toggleCategory(cat, checked) {
+  if (checked) activeCategories.add(cat);
+  else activeCategories.delete(cat);
+  document.querySelector(`.legend-item[data-cat="${cat}"]`).classList.toggle('off', !checked);
+  selectCase(currentCaseIdx);
+}
+
+// ===== Event List Panel =====
+function toggleEventList() {
+  const panel = document.getElementById('eventListPanel');
+  const btn = document.getElementById('evtListBtn');
+  panel.classList.toggle('open');
+  btn.textContent = panel.classList.contains('open') ? '隱藏事件列表' : '顯示事件列表';
+}
+
+function buildEventList(caseData) {
+  const merged = getMergedEvents(caseData);
+  const tbody = document.getElementById('eventListBody');
+  if (!merged.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:12px;">無事件</td></tr>';
+    return;
+  }
+  const sorted = [...merged].sort((a, b) => a.date > b.date ? -1 : 1);
+  tbody.innerHTML = sorted.map(evt => {
+    const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+    const impactLabel = evt.expected_impact === 'negative' ? '利空' : evt.expected_impact === 'positive' ? '利好' : '中性';
+    const impactColor = evt.expected_impact === 'negative' ? 'var(--up-color)' : evt.expected_impact === 'positive' ? 'var(--down-color)' : 'var(--text-secondary)';
+    const isUser = evt.event_id.startsWith('user_');
+    const actions = isUser
+      ? `<button class="btn-xs" onclick="editEvent('${evt.event_id}')">編輯</button> <button class="btn-xs btn-danger" onclick="deleteEvent('${evt.event_id}')">刪除</button>`
+      : '<span style="color:var(--text-secondary)">Demo</span>';
+    return `<tr>
+      <td style="white-space:nowrap">${evt.date}</td>
+      <td><span class="evt-cat-dot" style="background:${catInfo.color}"></span>${catInfo.label}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${evt.title}">${evt.title}</td>
+      <td style="color:${impactColor}">${impactLabel}</td>
+      <td>${Math.round((evt.confidence || 0) * 100)}%</td>
+      <td>${isUser ? '私人' : (evt.source_type || '')}</td>
+      <td style="white-space:nowrap">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== Edit / Delete =====
+let editingEventId = null;
+
+function editEvent(eventId) {
+  const events = getUserEvents();
+  const evt = events.find(e => e.event_id === eventId);
+  if (!evt) return;
+
+  editingEventId = eventId;
+  openAddForm();
+
+  // Pre-fill form
+  document.getElementById('fmStock').value = evt.related_stocks[0] || '';
+  document.getElementById('fmTitle').value = evt.title;
+  document.getElementById('fmDesc').value = evt.description;
+  document.getElementById('fmDateReceived').value = evt.date_received || evt.date;
+  document.getElementById('fmDateEvent').value = evt.date_event_estimated || '';
+  document.getElementById('fmDateUnknown').checked = !evt.date_event_estimated;
+  document.getElementById('fmDateEvent').disabled = !evt.date_event_estimated;
+  document.getElementById('fmImpact').value = evt.expected_impact;
+  document.getElementById('fmSourceLevel').value = (evt.metadata && evt.metadata.source_level) || '';
+  document.getElementById('fmConfidence').value = Math.round(evt.confidence * 100);
+  document.getElementById('fmConfVal').textContent = Math.round(evt.confidence * 100) + '%';
+
+  // Change modal title
+  document.querySelector('#addModal .modal-header h3').textContent = '編輯私人消息';
+}
+
+function deleteEvent(eventId) {
+  if (!confirm('確定刪除這則消息？')) return;
+  let events = getUserEvents();
+  const deleted = events.find(e => e.event_id === eventId);
+  events = events.filter(e => e.event_id !== eventId);
+  saveUserEvents(events);
+  addEditLog('delete', eventId, deleted ? { title: deleted.title } : {});
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+}
+
+// ===== Edit LOG =====
+const LOG_KEY = 'signal_dashboard_edit_log';
+
+function getEditLog() {
+  try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function addEditLog(action, eventId, changes) {
+  const log = getEditLog();
+  log.push({
+    action: action,
+    event_id: eventId,
+    timestamp: new Date().toISOString(),
+    changes: changes
+  });
+  localStorage.setItem(LOG_KEY, JSON.stringify(log));
+}
+
+// Override submitEvent to support edit mode + logging
+const _origSubmit = submitEvent;
+submitEvent = function() {
+  const stock = document.getElementById('fmStock').value;
+  const title = document.getElementById('fmTitle').value.trim();
+  const desc = document.getElementById('fmDesc').value.trim();
+  const dateReceived = document.getElementById('fmDateReceived').value;
+  const dateEvent = document.getElementById('fmDateUnknown').checked ? null : document.getElementById('fmDateEvent').value;
+  const impact = document.getElementById('fmImpact').value;
+  const confidence = parseInt(document.getElementById('fmConfidence').value) / 100;
+  const sourceLevel = document.getElementById('fmSourceLevel').value;
+
+  if (!stock) return alert('請選擇關聯股票');
+  if (!title) return alert('請輸入事件標題');
+  if (!desc) return alert('請輸入事件描述');
+  if (!dateReceived) return alert('請選擇消息取得日期');
+
+  const events = getUserEvents();
+
+  if (editingEventId) {
+    // Edit mode
+    const idx = events.findIndex(e => e.event_id === editingEventId);
+    if (idx === -1) return alert('找不到該事件');
+    const old = { ...events[idx] };
+    events[idx] = {
+      ...events[idx],
+      date: dateEvent || dateReceived,
+      date_received: dateReceived,
+      date_event_estimated: dateEvent || null,
+      title, description: desc,
+      related_stocks: [stock],
+      expected_impact: impact,
+      confidence,
+      metadata: { ...events[idx].metadata, source_level: sourceLevel || null, last_edited: new Date().toISOString() }
+    };
+    saveUserEvents(events);
+    addEditLog('edit', editingEventId, { old_title: old.title, new_title: title });
+    editingEventId = null;
+  } else {
+    // Create mode
+    const evt = {
+      event_id: 'user_' + Date.now(),
+      date: dateEvent || dateReceived,
+      date_received: dateReceived,
+      date_event_estimated: dateEvent || null,
+      title, description: desc,
+      category: 'insider_private',
+      source_type: 'private', source_url: '',
+      related_stocks: [stock],
+      expected_impact: impact,
+      confidence,
+      tags: ['user_input'],
+      metadata: { source_level: sourceLevel || null, input_method: 'manual_form', created_at: new Date().toISOString() }
+    };
+    events.push(evt);
+    saveUserEvents(events);
+    addEditLog('create', evt.event_id, { title });
+  }
+
+  closeAddForm();
+  document.querySelector('#addModal .modal-header h3').textContent = '新增私人消息';
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+};
+
+// Override exportUserEvents to include edit log
+const _origExport = exportUserEvents;
+exportUserEvents = function() {
+  const events = getUserEvents();
+  const log = getEditLog();
+  if (!events.length && !log.length) return alert('目前沒有用戶輸入的消息');
+  const output = {
+    exported_at: new Date().toISOString(),
+    count: events.length,
+    events,
+    edit_log: log
+  };
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `user_events_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 // ===== Go =====
 init().catch(err => {
