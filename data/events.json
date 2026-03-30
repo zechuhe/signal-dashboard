@@ -97,6 +97,24 @@
           }
         },
         {
+          "event_id": "evt_005b",
+          "date": "2017-09-15",
+          "title": "[私人] 知情人士透露長實洽談出售中環中心",
+          "description": "（模擬私人消息）地產圈知情人士透露，長實正在與數個財團洽談出售中環中心大部分樓層，交易規模可能超過 300 億港元。此消息先於公開報導約 6 週。",
+          "category": "insider_private",
+          "source_type": "private",
+          "source_url": "",
+          "expected_impact": "negative",
+          "confidence": 0.7,
+          "tags": ["asset_disposal", "real_estate", "insider_tip", "demo_simulated"],
+          "metadata": {
+            "person": "地產圈知情人士",
+            "person_level": "industry_contact",
+            "event_scale": "landmark",
+            "note": "此為 Demo 模擬事件，用於展示私人消息類型的顯示效果"
+          }
+        },
+        {
           "event_id": "evt_006",
           "date": "2017-11-01",
           "title": "出售中環中心 402 億港元",
@@ -135,42 +153,62 @@
     {
       "case_id": "case_002",
       "title": "杜軍內幕交易案（港史最長刑期）",
-      "description": "摩根士丹利亞洲前董事總經理杜軍，在擔任中信資源收購哈薩克石油資產的顧問期間，利用內幕消息獲利 2,330 萬港元，被判 7 年監禁。",
+      "description": "摩根士丹利亞洲前董事總經理杜軍，在擔任中信資源收購哈薩克石油資產的顧問期間，利用內幕消息透過親屬帳戶買入股票及認股權證（warrants），在消息洩漏導致股價異動期間（9/19-9/28 漲 19%）獲利。權證的槓桿效應放大了收益，最終不當利潤達 2,330 萬港元，被判 7 年監禁。",
       "related_stocks": ["HKEX:1205"],
       "time_range": {"start": "2007-01-01", "end": "2010-01-01"},
       "events": [
         {
           "event_id": "evt_010",
-          "date": "2007-09-17",
-          "title": "杜軍開始透過親屬帳戶買入中信資源",
-          "description": "杜軍在擔任中信資源收購哈薩克石油資產交易的財務顧問期間，透過妻子及親屬帳戶秘密買入中信資源股票及認股權證。（事後法庭調查確認的時間點）",
+          "date": "2007-09-10",
+          "title": "[私人] 杜軍取得收購內幕消息",
+          "description": "杜軍在擔任中信資源收購哈薩克石油資產交易的財務顧問期間，獲悉收購計畫細節。隨後透過妻子及親屬帳戶秘密買入中信資源股票及認股權證（warrants，具槓桿效應）。買入均價約 HK$3.2。",
           "category": "insider_private",
           "source_type": "court_record",
           "source_url": "https://legalref.judiciary.hk/",
           "expected_impact": "positive",
           "confidence": 0.95,
-          "tags": ["insider_trading", "stock_purchase", "advisory_role"],
+          "tags": ["insider_trading", "stock_purchase", "advisory_role", "warrants"],
           "metadata": {
             "person": "杜軍 (Du Jun)",
             "person_level": "managing_director",
             "company": "Morgan Stanley Asia",
-            "profit_hkd": 23300000
+            "profit_hkd": 23300000,
+            "instrument": "股票 + 認股權證（warrants）",
+            "entry_price_approx": 3.2
           }
         },
         {
-          "event_id": "evt_011",
-          "date": "2007-11-12",
-          "title": "中信資源宣布收購哈薩克石油資產",
-          "description": "中信資源正式公告收購哈薩克斯坦 Karazhanbas 油田權益，交易金額約 19.1 億美元。消息公布後股價急漲約 50%。",
+          "event_id": "evt_011a",
+          "date": "2007-09-19",
+          "title": "收購消息疑洩漏，股價異動",
+          "description": "中信資源股價從 HK$3.18 急升至 HK$3.52（+10.7%），成交量從 1800 萬股暴增至 4400 萬股。市場疑似已有收購消息流出。9/19-9/28 期間持續拉升至 HK$3.78（累計 +19%），成交量最高達 1.07 億股。",
           "category": "public_corporate",
-          "source_type": "company_ir",
+          "source_type": "news",
           "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2007/",
           "expected_impact": "positive",
-          "confidence": 0.95,
-          "tags": ["acquisition", "oil_gas", "kazakhstan"],
+          "confidence": 0.85,
+          "tags": ["abnormal_volume", "price_surge", "leak_suspected"],
           "metadata": {
-            "deal_value_usd": 1910000000,
-            "target_asset": "Karazhanbas oil field"
+            "price_before": 3.18,
+            "price_peak": 3.78,
+            "surge_pct": 19,
+            "volume_surge_multiple": 6
+          }
+        },
+        {
+          "event_id": "evt_011b",
+          "date": "2007-10-03",
+          "title": "巨量拋售，單日成交 4.3 億股",
+          "description": "中信資源單日成交量暴增至 4.32 億股（正常日的 30 倍），股價從 HK$3.77 跌至 HK$3.47（-8%）。杜軍的認股權證在此前的高位已產生顯著帳面利潤，正股下跌後權證因槓桿效應跌幅更大。",
+          "category": "public_corporate",
+          "source_type": "news",
+          "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2007/",
+          "expected_impact": "negative",
+          "confidence": 0.8,
+          "tags": ["massive_selloff", "abnormal_volume", "profit_taking"],
+          "metadata": {
+            "volume": 432147953,
+            "price_drop_pct": -8
           }
         },
         {
