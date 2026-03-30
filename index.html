@@ -173,6 +173,80 @@ body {
 }
 .footer a { color: var(--accent); text-decoration: none; }
 
+/* ===== Action Buttons ===== */
+.action-bar {
+  display: flex; gap: 8px; padding: 8px 20px;
+  align-items: center;
+}
+.btn {
+  padding: 6px 14px; font-size: 12px; border-radius: 4px;
+  cursor: pointer; transition: all 0.15s; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+}
+.btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.btn-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.btn-primary:hover { background: #2563eb; }
+.btn-export { background: rgba(76,205,196,0.15); color: #4ECDC4; border-color: #4ECDC4; }
+.user-event-count {
+  font-size: 11px; color: var(--text-secondary);
+  margin-left: auto;
+}
+
+/* ===== Form Modal ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--panel-bg); border-radius: 8px;
+  width: 480px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; border: 1px solid var(--border);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 16px 20px; }
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+}
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block; font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 4px; letter-spacing: 0.3px;
+}
+.form-label .required { color: var(--up-color); }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 8px 10px; font-size: 13px;
+  background: var(--bg); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 4px;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent);
+}
+.form-textarea { resize: vertical; min-height: 60px; }
+.form-row { display: flex; gap: 12px; }
+.form-row > .form-group { flex: 1; }
+.form-checkbox-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+}
+.form-checkbox-row input { accent-color: var(--accent); }
+.slider-wrapper { display: flex; align-items: center; gap: 8px; }
+.slider-wrapper input[type=range] {
+  flex: 1; accent-color: var(--accent);
+}
+.slider-value {
+  min-width: 36px; text-align: center;
+  font-size: 13px; color: var(--accent); font-weight: 600;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .stock-info { padding: 8px 12px 4px; gap: 8px; }
@@ -190,7 +264,11 @@ body {
     <h1>Signal Dashboard</h1>
     <span class="subtitle">消息面 × 股價關聯分析</span>
   </div>
-  <span style="font-size:11px;color:var(--text-secondary);">Demo v1.0 — proj_147</span>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-primary" onclick="openAddForm()">+ 新增私人消息</button>
+    <button class="btn btn-export" onclick="exportUserEvents()">匯出 JSON</button>
+    <span style="font-size:11px;color:var(--text-secondary);">v2.0</span>
+  </div>
 </div>
 
 <div class="case-tabs" id="caseTabs"></div>
@@ -216,6 +294,79 @@ body {
     <button class="event-panel-close" onclick="closePanel()">&times;</button>
   </div>
   <div class="event-detail" id="panelContent"></div>
+</div>
+
+<!-- ===== Add Event Modal ===== -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>新增私人消息</h3>
+      <button class="event-panel-close" onclick="closeAddForm()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">關聯股票 <span class="required">*</span></label>
+        <select class="form-select" id="fmStock">
+          <option value="">— 請選擇 —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">事件標題 <span class="required">*</span>（30 字內）</label>
+        <input class="form-input" id="fmTitle" maxlength="30" placeholder="例：XX公司OO項目主管離職">
+      </div>
+      <div class="form-group">
+        <label class="form-label">事件描述 <span class="required">*</span></label>
+        <textarea class="form-textarea" id="fmDesc" placeholder="詳細描述消息內容、來源背景、可能影響..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">消息取得日期 <span class="required">*</span></label>
+          <input class="form-input" type="date" id="fmDateReceived">
+        </div>
+        <div class="form-group">
+          <label class="form-label">推測事件發生日期</label>
+          <input class="form-input" type="date" id="fmDateEvent" >
+          <div class="form-checkbox-row">
+            <input type="checkbox" id="fmDateUnknown" onchange="document.getElementById('fmDateEvent').disabled=this.checked">
+            <label for="fmDateUnknown">無法推測</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">預期影響 <span class="required">*</span></label>
+          <select class="form-select" id="fmImpact">
+            <option value="negative">利空</option>
+            <option value="positive">利好</option>
+            <option value="neutral">不確定</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">消息來源層級</label>
+          <select class="form-select" id="fmSourceLevel">
+            <option value="">— 選填 —</option>
+            <option value="board">董事會</option>
+            <option value="c_suite">高管 (C-Suite)</option>
+            <option value="vp">VP / 總監</option>
+            <option value="manager">中層主管</option>
+            <option value="industry">業界人脈</option>
+            <option value="internet">網路傳聞</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">信心度 <span class="required">*</span></label>
+        <div class="slider-wrapper">
+          <input type="range" id="fmConfidence" min="0" max="100" value="50" oninput="document.getElementById('fmConfVal').textContent=this.value+'%'">
+          <span class="slider-value" id="fmConfVal">50%</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAddForm()">取消</button>
+      <button class="btn btn-primary" onclick="submitEvent()">確認新增</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -263,6 +414,7 @@ async function init() {
   // Build tabs
   buildCaseTabs();
   selectCase(0);
+  updateUserEventCount();
 }
 
 function buildLegend(categories) {
@@ -380,10 +532,11 @@ function renderChart(caseData, priceData) {
   const ma20 = computeMA(closes, 20);
   const ma60 = computeMA(closes, 60);
 
-  // Event markers
+  // Event markers (merge user events)
+  const mergedEvents = getMergedEvents(caseData);
   const eventMarkers = [];
   const eventLines = [];
-  caseData.events.forEach(evt => {
+  mergedEvents.forEach(evt => {
     const idx = dates.indexOf(evt.date);
     const catInfo = CATEGORY_COLORS[evt.category] || { color: '#FF9500', label: evt.category };
 
@@ -488,7 +641,7 @@ function renderChart(caseData, priceData) {
         const sign = d.change >= 0 ? '+' : '';
 
         let evtHtml = '';
-        const evtsOnDate = caseData.events.filter(e => {
+        const evtsOnDate = mergedEvents.filter(e => {
           const eidx = dates.indexOf(e.date);
           const nidx = findNearestDate(dates, e.date);
           return eidx === idx || nidx === idx;
@@ -769,8 +922,137 @@ function formatMoney(v) {
   return '' + v;
 }
 
-// Keyboard shortcut: Escape to close panel
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+// Keyboard shortcut: Escape to close panel/modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closePanel(); closeAddForm(); }
+});
+
+// ===== User Events (localStorage) =====
+const LS_KEY = 'signal_dashboard_user_events';
+
+function getUserEvents() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveUserEvents(events) {
+  localStorage.setItem(LS_KEY, JSON.stringify(events));
+}
+
+function openAddForm() {
+  // Populate stock dropdown from loaded price data
+  const sel = document.getElementById('fmStock');
+  sel.innerHTML = '<option value="">— 請選擇 —</option>';
+  Object.values(allPriceData).forEach(pd => {
+    const opt = document.createElement('option');
+    opt.value = pd.meta.symbol;
+    opt.textContent = `${pd.meta.name} (${pd.meta.symbol})`;
+    sel.appendChild(opt);
+  });
+  // Default date to today
+  document.getElementById('fmDateReceived').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('fmDateEvent').value = '';
+  document.getElementById('fmDateEvent').disabled = false;
+  document.getElementById('fmDateUnknown').checked = false;
+  document.getElementById('fmTitle').value = '';
+  document.getElementById('fmDesc').value = '';
+  document.getElementById('fmConfidence').value = 50;
+  document.getElementById('fmConfVal').textContent = '50%';
+  document.getElementById('fmImpact').value = 'negative';
+  document.getElementById('fmSourceLevel').value = '';
+  document.getElementById('addModal').classList.add('open');
+}
+
+function closeAddForm() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function submitEvent() {
+  const stock = document.getElementById('fmStock').value;
+  const title = document.getElementById('fmTitle').value.trim();
+  const desc = document.getElementById('fmDesc').value.trim();
+  const dateReceived = document.getElementById('fmDateReceived').value;
+  const dateEvent = document.getElementById('fmDateUnknown').checked ? null : document.getElementById('fmDateEvent').value;
+  const impact = document.getElementById('fmImpact').value;
+  const confidence = parseInt(document.getElementById('fmConfidence').value) / 100;
+  const sourceLevel = document.getElementById('fmSourceLevel').value;
+
+  // Validation
+  if (!stock) return alert('請選擇關聯股票');
+  if (!title) return alert('請輸入事件標題');
+  if (!desc) return alert('請輸入事件描述');
+  if (!dateReceived) return alert('請選擇消息取得日期');
+
+  const evt = {
+    event_id: 'user_' + Date.now(),
+    date: dateEvent || dateReceived,
+    date_received: dateReceived,
+    date_event_estimated: dateEvent || null,
+    title: title,
+    description: desc,
+    category: 'insider_private',
+    source_type: 'private',
+    source_url: '',
+    related_stocks: [stock],
+    expected_impact: impact,
+    confidence: confidence,
+    tags: ['user_input'],
+    metadata: {
+      source_level: sourceLevel || null,
+      input_method: 'manual_form',
+      created_at: new Date().toISOString()
+    }
+  };
+
+  const events = getUserEvents();
+  events.push(evt);
+  saveUserEvents(events);
+
+  closeAddForm();
+  // Re-render current case to show new event
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+}
+
+function exportUserEvents() {
+  const events = getUserEvents();
+  if (!events.length) return alert('目前沒有用戶輸入的消息');
+
+  const output = {
+    exported_at: new Date().toISOString(),
+    count: events.length,
+    events: events
+  };
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `user_events_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updateUserEventCount() {
+  const count = getUserEvents().length;
+  let el = document.getElementById('userEventCount');
+  if (!el) {
+    el = document.createElement('span');
+    el.id = 'userEventCount';
+    el.style.cssText = 'font-size:11px;color:var(--text-secondary);margin-left:8px;';
+    document.querySelector('.header > div:last-child').insertBefore(el, document.querySelector('.header > div:last-child > span:last-child'));
+  }
+  el.textContent = count > 0 ? `${count} 則私人消息` : '';
+}
+
+// Merge user events into case events for rendering
+function getMergedEvents(caseData) {
+  const userEvents = getUserEvents();
+  const caseStocks = new Set(caseData.related_stocks);
+  const relevantUserEvents = userEvents.filter(e =>
+    e.related_stocks.some(s => caseStocks.has(s))
+  );
+  return [...caseData.events, ...relevantUserEvents];
+}
 
 // ===== Go =====
 init().catch(err => {
