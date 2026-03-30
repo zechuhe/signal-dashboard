@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消息面×股價關聯分析 Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+/* ===== Futu-inspired Dark Theme ===== */
+:root {
+  --bg: #1B1B1F;
+  --panel-bg: #232328;
+  --grid-line: #2A2A2E;
+  --up-color: #F04848;
+  --down-color: #00B07C;
+  --text-primary: #E8E8E8;
+  --text-secondary: #888888;
+  --accent: #3B82F6;
+  --ma5: #C0A254;
+  --ma10: #E091EB;
+  --ma20: #6FBAFF;
+  --ma60: #44CE7A;
+  --border: #333338;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+.header h1 {
+  font-size: 16px; font-weight: 600;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header .subtitle { font-size: 12px; color: var(--text-secondary); margin-left: 12px; }
+
+/* ===== Case Tabs ===== */
+.case-tabs {
+  display: flex; gap: 0; padding: 0 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.case-tab {
+  padding: 10px 16px; cursor: pointer;
+  font-size: 13px; color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap; transition: all 0.2s;
+  user-select: none;
+}
+.case-tab:hover { color: var(--text-primary); }
+.case-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+/* ===== Stock Info Bar ===== */
+.stock-info {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 12px 20px 4px;
+  flex-wrap: wrap;
+}
+.stock-name { font-size: 18px; font-weight: 700; }
+.stock-code { font-size: 13px; color: var(--text-secondary); }
+.stock-price { font-size: 22px; font-weight: 700; margin-left: 8px; }
+.stock-change { font-size: 14px; margin-left: 4px; }
+.stock-meta { font-size: 12px; color: var(--text-secondary); }
+.price-up { color: var(--up-color); }
+.price-down { color: var(--down-color); }
+
+/* ===== Time Range Buttons ===== */
+.time-range {
+  display: flex; gap: 2px; padding: 4px 20px 8px;
+}
+.range-btn {
+  padding: 4px 10px; font-size: 12px;
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: 4px;
+  cursor: pointer; transition: all 0.15s;
+}
+.range-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.range-btn.active {
+  color: #fff; background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ===== Chart Container ===== */
+#chart-container {
+  width: 100%; height: calc(100vh - 240px);
+  min-height: 500px;
+}
+
+/* ===== Event Panel (Side) ===== */
+.event-panel {
+  position: fixed; right: -420px; top: 0; bottom: 0;
+  width: 400px; background: var(--panel-bg);
+  border-left: 1px solid var(--border);
+  z-index: 100; transition: right 0.3s ease;
+  overflow-y: auto; padding: 0;
+}
+.event-panel.open { right: 0; }
+.event-panel-header {
+  position: sticky; top: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+.event-panel-header h3 { font-size: 15px; font-weight: 600; }
+.event-panel-close {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text-secondary); cursor: pointer; font-size: 16px;
+}
+.event-panel-close:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.event-detail { padding: 16px 20px; }
+.event-detail .field { margin-bottom: 12px; }
+.event-detail .field-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.event-detail .field-value { font-size: 14px; line-height: 1.5; }
+.event-tag {
+  display: inline-block; padding: 2px 8px; margin: 2px 4px 2px 0;
+  font-size: 11px; border-radius: 3px;
+  background: rgba(59,130,246,0.15); color: var(--accent);
+}
+.event-source-link {
+  color: var(--accent); text-decoration: none; word-break: break-all;
+}
+.event-source-link:hover { text-decoration: underline; }
+.event-impact {
+  display: inline-block; padding: 2px 10px; border-radius: 3px;
+  font-size: 12px; font-weight: 600;
+}
+.impact-negative { background: rgba(240,72,72,0.15); color: var(--up-color); }
+.impact-positive { background: rgba(0,176,124,0.15); color: var(--down-color); }
+.impact-neutral { background: rgba(136,136,136,0.15); color: var(--text-secondary); }
+
+/* ===== Overlay ===== */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ===== Category Legend ===== */
+.legend {
+  display: flex; gap: 16px; padding: 8px 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ===== Footer ===== */
+.footer {
+  padding: 8px 20px;
+  font-size: 11px; color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .stock-info { padding: 8px 12px 4px; gap: 8px; }
+  .stock-name { font-size: 15px; }
+  .stock-price { font-size: 18px; }
+  .event-panel { width: 100%; right: -100%; }
+  .case-tab { padding: 8px 12px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:baseline;">
+    <h1>Signal Dashboard</h1>
+    <span class="subtitle">消息面 × 股價關聯分析</span>
+  </div>
+  <span style="font-size:11px;color:var(--text-secondary);">Demo v1.0 — proj_147</span>
+</div>
+
+<div class="case-tabs" id="caseTabs"></div>
+
+<div class="stock-info" id="stockInfo"></div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+  <div class="time-range" id="timeRange"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="chart-container"></div>
+
+<div class="footer">
+  Data source: Yahoo Finance (yfinance) | 事件資料僅供分析研究用途 |
+  <a href="https://github.com" target="_blank">GitHub</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="event-panel" id="eventPanel">
+  <div class="event-panel-header">
+    <h3 id="panelTitle">事件詳情</h3>
+    <button class="event-panel-close" onclick="closePanel()">&times;</button>
+  </div>
+  <div class="event-detail" id="panelContent"></div>
+</div>
+
+<script>
+// ===== State =====
+let allCases = [];
+let allPriceData = {};
+let currentCaseIdx = 0;
+let chart = null;
+const CATEGORY_COLORS = {};
+
+// ===== Data Loading =====
+async function loadJSON(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Failed to load ${url}: ${resp.status}`);
+  return resp.json();
+}
+
+async function init() {
+  // Load events
+  const eventsData = await loadJSON('data/events.json');
+  allCases = eventsData.cases;
+  Object.assign(CATEGORY_COLORS, Object.fromEntries(
+    Object.entries(eventsData.categories).map(([k, v]) => [k, v])
+  ));
+
+  // Build legend
+  buildLegend(eventsData.categories);
+
+  // Load all price files
+  const priceFiles = [
+    'price_HKEX_0001', 'price_HKEX_1113', 'price_HKEX_1205',
+    'price_HKEX_0939', 'price_HKEX_0700', 'price_HKEX_0388', 'price_INDEX_HSI'
+  ];
+  await Promise.all(priceFiles.map(async (f) => {
+    try {
+      const data = await loadJSON(`data/${f}.json`);
+      allPriceData[data.meta.symbol] = data;
+    } catch (e) { console.warn(`Skip ${f}: ${e.message}`); }
+  }));
+
+  // Init chart
+  chart = echarts.init(document.getElementById('chart-container'), null, { renderer: 'canvas' });
+  window.addEventListener('resize', () => chart.resize());
+
+  // Build tabs
+  buildCaseTabs();
+  selectCase(0);
+}
+
+function buildLegend(categories) {
+  const el = document.getElementById('legend');
+  el.innerHTML = Object.entries(categories).map(([k, v]) =>
+    `<div class="legend-item"><span class="legend-dot" style="background:${v.color}"></span>${v.label}</div>`
+  ).join('');
+}
+
+function buildCaseTabs() {
+  const el = document.getElementById('caseTabs');
+  el.innerHTML = allCases.map((c, i) =>
+    `<div class="case-tab ${i === 0 ? 'active' : ''}" onclick="selectCase(${i})">${c.title}</div>`
+  ).join('');
+}
+
+// ===== Case Selection =====
+function selectCase(idx) {
+  currentCaseIdx = idx;
+  const c = allCases[idx];
+
+  // Update tab highlight
+  document.querySelectorAll('.case-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+
+  // Use first stock as primary
+  const primarySymbol = c.related_stocks[0];
+  const priceData = allPriceData[primarySymbol];
+
+  if (!priceData) {
+    document.getElementById('stockInfo').innerHTML = `<span style="color:var(--up-color)">Stock data not found: ${primarySymbol}</span>`;
+    return;
+  }
+
+  // Update stock info bar
+  updateStockInfo(priceData);
+
+  // Build time range buttons
+  buildTimeRange(priceData);
+
+  // Render chart
+  renderChart(c, priceData);
+}
+
+function updateStockInfo(priceData) {
+  const meta = priceData.meta;
+  const last = priceData.data[priceData.data.length - 1];
+  const isUp = last.change >= 0;
+  const cls = isUp ? 'price-up' : 'price-down';
+  const sign = isUp ? '+' : '';
+
+  document.getElementById('stockInfo').innerHTML = `
+    <span class="stock-name">${meta.name}</span>
+    <span class="stock-code">${meta.symbol} · ${meta.currency}</span>
+    <span class="stock-price ${cls}">${last.close.toFixed(meta.price_precision)}</span>
+    <span class="stock-change ${cls}">${sign}${last.change.toFixed(meta.price_precision)} (${sign}${last.change_pct.toFixed(2)}%)</span>
+    <span class="stock-meta">${last.date} · ${meta.exchange}</span>
+  `;
+}
+
+function buildTimeRange(priceData) {
+  const dataLen = priceData.data.length;
+  const ranges = [
+    { label: '3M', days: 63 },
+    { label: '6M', days: 126 },
+    { label: '1Y', days: 252 },
+    { label: '3Y', days: 756 },
+    { label: '全部', days: dataLen }
+  ];
+
+  const el = document.getElementById('timeRange');
+  el.innerHTML = ranges.map((r, i) =>
+    `<button class="range-btn ${r.days >= dataLen ? 'active' : ''}" onclick="setRange(${r.days}, this)">${r.label}</button>`
+  ).join('');
+
+  // Default: show all
+  el.querySelector('.range-btn:last-child').classList.add('active');
+}
+
+function setRange(days, btn) {
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const c = allCases[currentCaseIdx];
+  const priceData = allPriceData[c.related_stocks[0]];
+  const total = priceData.data.length;
+  const start = Math.max(0, Math.round((1 - days / total) * 100));
+
+  chart.dispatchAction({
+    type: 'dataZoom',
+    start: days >= total ? 0 : start,
+    end: 100
+  });
+}
+
+// ===== Chart Rendering =====
+function renderChart(caseData, priceData) {
+  const dates = priceData.data.map(d => d.date);
+  const closes = priceData.data.map(d => d.close);
+  const volumes = priceData.data.map(d => d.volume);
+  const opens = priceData.data.map(d => d.open);
+  const highs = priceData.data.map(d => d.high);
+  const lows = priceData.data.map(d => d.low);
+
+  // K-line data: [open, close, low, high]
+  const klineData = priceData.data.map(d => [d.open, d.close, d.low, d.high]);
+
+  // Volume colors
+  const volumeColors = priceData.data.map(d => d.close >= d.open ? '#F04848' : '#00B07C');
+
+  // Compute MAs
+  const ma5 = computeMA(closes, 5);
+  const ma10 = computeMA(closes, 10);
+  const ma20 = computeMA(closes, 20);
+  const ma60 = computeMA(closes, 60);
+
+  // Event markers
+  const eventMarkers = [];
+  const eventLines = [];
+  caseData.events.forEach(evt => {
+    const idx = dates.indexOf(evt.date);
+    const catInfo = CATEGORY_COLORS[evt.category] || { color: '#FF9500', label: evt.category };
+
+    if (idx >= 0) {
+      eventMarkers.push({
+        coord: [idx, lows[idx] * 0.995],
+        value: evt.title,
+        symbol: 'pin',
+        symbolSize: 32,
+        itemStyle: { color: catInfo.color },
+        _eventData: evt
+      });
+    } else {
+      // Find nearest date
+      const nearestIdx = findNearestDate(dates, evt.date);
+      if (nearestIdx >= 0) {
+        eventMarkers.push({
+          coord: [nearestIdx, lows[nearestIdx] * 0.995],
+          value: evt.title,
+          symbol: 'pin',
+          symbolSize: 32,
+          itemStyle: { color: catInfo.color },
+          _eventData: evt
+        });
+      }
+    }
+
+    // Vertical line at event date
+    const lineIdx = idx >= 0 ? idx : findNearestDate(dates, evt.date);
+    if (lineIdx >= 0) {
+      eventLines.push({
+        xAxis: lineIdx,
+        lineStyle: { color: catInfo.color, type: 'dashed', width: 1, opacity: 0.4 },
+        label: {
+          formatter: evt.title.length > 8 ? evt.title.substring(0, 8) + '..' : evt.title,
+          position: 'insideStartTop',
+          fontSize: 9,
+          color: catInfo.color,
+          rotate: 90,
+          offset: [5, 0],
+          backgroundColor: 'rgba(27,27,31,0.8)',
+          padding: [2, 4]
+        }
+      });
+    }
+  });
+
+  // ===== Second stock overlay (if exists) =====
+  const secondSymbol = caseData.related_stocks.length > 1 ? caseData.related_stocks[1] : null;
+  let secondSeries = [];
+  let secondYAxis = [];
+  if (secondSymbol && allPriceData[secondSymbol]) {
+    const sp = allPriceData[secondSymbol];
+    // Align dates
+    const secondCloses = dates.map(d => {
+      const found = sp.data.find(r => r.date === d);
+      return found ? found.close : null;
+    });
+    secondSeries = [{
+      name: sp.meta.name,
+      type: 'line',
+      xAxisIndex: 0,
+      yAxisIndex: 2,
+      data: secondCloses,
+      smooth: true,
+      lineStyle: { width: 1.5, color: '#a78bfa', type: 'dashed' },
+      itemStyle: { color: '#a78bfa' },
+      symbol: 'none',
+      z: 1
+    }];
+    secondYAxis = [{
+      type: 'value',
+      position: 'right',
+      offset: 50,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { color: '#a78bfa', fontSize: 10, formatter: '{value}' }
+    }];
+  }
+
+  const option = {
+    animation: true,
+    backgroundColor: '#1B1B1F',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        crossStyle: { color: '#888' },
+        lineStyle: { color: '#888', type: 'dashed' }
+      },
+      backgroundColor: 'rgba(35,35,40,0.95)',
+      borderColor: '#333',
+      textStyle: { color: '#E8E8E8', fontSize: 12 },
+      formatter: function(params) {
+        if (!params || !params.length) return '';
+        const idx = params[0].dataIndex;
+        const d = priceData.data[idx];
+        if (!d) return '';
+        const isUp = d.close >= d.open;
+        const color = isUp ? '#F04848' : '#00B07C';
+        const sign = d.change >= 0 ? '+' : '';
+
+        let evtHtml = '';
+        const evtsOnDate = caseData.events.filter(e => {
+          const eidx = dates.indexOf(e.date);
+          const nidx = findNearestDate(dates, e.date);
+          return eidx === idx || nidx === idx;
+        });
+        if (evtsOnDate.length > 0) {
+          evtHtml = '<hr style="border-color:#444;margin:6px 0">';
+          evtsOnDate.forEach(e => {
+            const catInfo = CATEGORY_COLORS[e.category] || { label: e.category, color: '#FF9500' };
+            evtHtml += `<div style="margin:4px 0"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${catInfo.color};margin-right:4px;"></span><b>${e.title}</b></div>`;
+            evtHtml += `<div style="font-size:11px;color:#999;margin-left:10px;">${e.description.substring(0, 80)}...</div>`;
+          });
+        }
+
+        let secondHtml = '';
+        if (secondSymbol && allPriceData[secondSymbol]) {
+          const sp = allPriceData[secondSymbol];
+          const sr = sp.data.find(r => r.date === d.date);
+          if (sr) {
+            secondHtml = `<div style="margin-top:4px;color:#a78bfa">${sp.meta.name}: ${sr.close.toFixed(2)}</div>`;
+          }
+        }
+
+        return `
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${d.date}</div>
+          <div>開 <span style="color:${color}">${d.open.toFixed(2)}</span> &nbsp;
+               高 <span style="color:${color}">${d.high.toFixed(2)}</span> &nbsp;
+               低 <span style="color:${color}">${d.low.toFixed(2)}</span> &nbsp;
+               收 <span style="color:${color}">${d.close.toFixed(2)}</span></div>
+          <div>漲跌 <span style="color:${color}">${sign}${d.change.toFixed(2)} (${sign}${d.change_pct}%)</span> &nbsp;
+               量 ${formatVolume(d.volume)}</div>
+          ${secondHtml}
+          ${evtHtml}
+        `;
+      }
+    },
+    axisPointer: {
+      link: [{ xAxisIndex: 'all' }],
+      label: { backgroundColor: '#333' }
+    },
+    grid: [
+      { left: 60, right: secondSymbol ? 120 : 60, top: 30, height: '55%' },
+      { left: 60, right: secondSymbol ? 120 : 60, top: '72%', height: '18%' }
+    ],
+    xAxis: [
+      {
+        type: 'category',
+        data: dates,
+        gridIndex: 0,
+        axisLine: { lineStyle: { color: '#2A2A2E' } },
+        axisTick: { show: false },
+        axisLabel: { color: '#888', fontSize: 10, rotate: 0 },
+        splitLine: { show: false },
+        boundaryGap: true,
+        axisPointer: { label: { formatter: p => p.value } }
+      },
+      {
+        type: 'category',
+        data: dates,
+        gridIndex: 1,
+        axisLine: { lineStyle: { color: '#2A2A2E' } },
+        axisTick: { show: false },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        boundaryGap: true
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        gridIndex: 0,
+        position: 'right',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#2A2A2E' } },
+        axisLabel: { color: '#888', fontSize: 10 }
+      },
+      {
+        type: 'value',
+        gridIndex: 1,
+        position: 'right',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#2A2A2E' } },
+        axisLabel: { color: '#888', fontSize: 10, formatter: v => formatVolume(v) },
+        max: function(value) { return value.max * 2.5; }
+      },
+      ...(secondYAxis.length ? [{ ...secondYAxis[0], gridIndex: 0 }] : [])
+    ],
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: [0, 1],
+        start: 0,
+        end: 100,
+        minValueSpan: 10,
+        zoomOnMouseWheel: true,
+        moveOnMouseMove: false
+      },
+      {
+        type: 'slider',
+        xAxisIndex: [0, 1],
+        start: 0,
+        end: 100,
+        height: 20,
+        bottom: 8,
+        borderColor: '#2A2A2E',
+        backgroundColor: '#1B1B1F',
+        fillerColor: 'rgba(59,130,246,0.15)',
+        handleStyle: { color: '#3B82F6' },
+        textStyle: { color: '#888', fontSize: 10 },
+        dataBackground: {
+          lineStyle: { color: '#444' },
+          areaStyle: { color: 'rgba(59,130,246,0.05)' }
+        }
+      }
+    ],
+    series: [
+      {
+        name: 'K Line',
+        type: 'candlestick',
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        data: klineData,
+        itemStyle: {
+          color: '#F04848',       // up fill
+          color0: '#00B07C',      // down fill
+          borderColor: '#F04848', // up border
+          borderColor0: '#00B07C' // down border
+        },
+        markPoint: {
+          data: eventMarkers,
+          label: { show: false },
+          tooltip: {
+            formatter: function(params) {
+              const evt = params.data._eventData;
+              if (!evt) return '';
+              const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+              return `<div style="max-width:300px">
+                <div style="font-weight:600;margin-bottom:4px;">${evt.title}</div>
+                <div style="font-size:11px;color:#999">${evt.date} · <span style="color:${catInfo.color}">${catInfo.label}</span></div>
+                <div style="margin-top:4px;font-size:12px">${evt.description}</div>
+                <div style="margin-top:6px;font-size:11px;color:var(--accent)">Click pin for details →</div>
+              </div>`;
+            }
+          }
+        },
+        markLine: {
+          silent: true,
+          data: eventLines,
+          symbol: 'none',
+          animation: false
+        },
+        z: 10
+      },
+      // MA lines
+      { name: 'MA5', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma5, smooth: true, lineStyle: { width: 1, color: '#C0A254' }, itemStyle: { color: '#C0A254' }, symbol: 'none', z: 2 },
+      { name: 'MA10', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma10, smooth: true, lineStyle: { width: 1, color: '#E091EB' }, itemStyle: { color: '#E091EB' }, symbol: 'none', z: 2 },
+      { name: 'MA20', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma20, smooth: true, lineStyle: { width: 1, color: '#6FBAFF' }, itemStyle: { color: '#6FBAFF' }, symbol: 'none', z: 2 },
+      { name: 'MA60', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma60, smooth: true, lineStyle: { width: 1, color: '#44CE7A' }, itemStyle: { color: '#44CE7A' }, symbol: 'none', z: 2 },
+      // Volume
+      {
+        name: 'Volume',
+        type: 'bar',
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: volumes.map((v, i) => ({
+          value: v,
+          itemStyle: { color: priceData.data[i].close >= priceData.data[i].open ? 'rgba(240,72,72,0.7)' : 'rgba(0,176,124,0.7)' }
+        })),
+        barWidth: '60%'
+      },
+      // Second stock overlay
+      ...secondSeries
+    ]
+  };
+
+  chart.setOption(option, true);
+
+  // Click handler for event markers
+  chart.off('click');
+  chart.on('click', function(params) {
+    if (params.componentType === 'markPoint' && params.data._eventData) {
+      openEventPanel(params.data._eventData);
+    }
+  });
+}
+
+// ===== Helpers =====
+function computeMA(data, window) {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i < window - 1) { result.push(null); continue; }
+    let sum = 0;
+    for (let j = 0; j < window; j++) sum += data[i - j];
+    result.push(+(sum / window).toFixed(2));
+  }
+  return result;
+}
+
+function findNearestDate(dates, target) {
+  let minDiff = Infinity, bestIdx = -1;
+  const t = new Date(target).getTime();
+  for (let i = 0; i < dates.length; i++) {
+    const diff = Math.abs(new Date(dates[i]).getTime() - t);
+    if (diff < minDiff) { minDiff = diff; bestIdx = i; }
+  }
+  return bestIdx;
+}
+
+function formatVolume(v) {
+  if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+  return '' + v;
+}
+
+// ===== Event Panel =====
+function openEventPanel(evt) {
+  const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+  const impactCls = evt.expected_impact === 'negative' ? 'impact-negative' :
+                    evt.expected_impact === 'positive' ? 'impact-positive' : 'impact-neutral';
+  const impactLabel = evt.expected_impact === 'negative' ? '利空' :
+                      evt.expected_impact === 'positive' ? '利好' : '中性';
+
+  let metaHtml = '';
+  if (evt.metadata) {
+    const entries = Object.entries(evt.metadata).filter(([k]) => !k.startsWith('_'));
+    if (entries.length) {
+      metaHtml = entries.map(([k, v]) => {
+        const display = typeof v === 'number' && v > 1e6 ? formatMoney(v) : v;
+        return `<div><span style="color:#888">${k}:</span> ${display}</div>`;
+      }).join('');
+    }
+  }
+
+  document.getElementById('panelTitle').textContent = evt.title;
+  document.getElementById('panelContent').innerHTML = `
+    <div class="field">
+      <div class="field-label">日期</div>
+      <div class="field-value">${evt.date}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">分類</div>
+      <div class="field-value"><span style="color:${catInfo.color}">${catInfo.label}</span></div>
+    </div>
+    <div class="field">
+      <div class="field-label">預期影響</div>
+      <div class="field-value"><span class="event-impact ${impactCls}">${impactLabel}</span> &nbsp; 信心度 ${(evt.confidence * 100).toFixed(0)}%</div>
+    </div>
+    <div class="field">
+      <div class="field-label">描述</div>
+      <div class="field-value">${evt.description}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">來源</div>
+      <div class="field-value">${evt.source_url ? `<a class="event-source-link" href="${evt.source_url}" target="_blank">${evt.source_url}</a>` : '<span style="color:#888">私人消息</span>'}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">標籤</div>
+      <div class="field-value">${(evt.tags || []).map(t => `<span class="event-tag">${t}</span>`).join('')}</div>
+    </div>
+    ${metaHtml ? `<div class="field"><div class="field-label">擴展資訊</div><div class="field-value" style="font-size:12px;">${metaHtml}</div></div>` : ''}
+  `;
+
+  document.getElementById('eventPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('eventPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function formatMoney(v) {
+  if (v >= 1e12) return (v / 1e12).toFixed(1) + ' 兆';
+  if (v >= 1e8) return (v / 1e8).toFixed(1) + ' 億';
+  if (v >= 1e4) return (v / 1e4).toFixed(0) + ' 萬';
+  return '' + v;
+}
+
+// Keyboard shortcut: Escape to close panel
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+// ===== Go =====
+init().catch(err => {
+  document.getElementById('chart-container').innerHTML =
+    `<div style="padding:40px;text-align:center;color:var(--up-color);">
+      載入失敗: ${err.message}<br><br>
+      <span style="color:var(--text-secondary);font-size:13px;">
+        請確認 data/ 目錄下有 events.json 及 price_*.json 檔案。<br>
+        如使用 file:// 協議開啟，部分瀏覽器會阻擋 fetch 請求，請用 HTTP server：<br>
+        <code>python -m http.server 8000</code>
+      </span>
+    </div>`;
+});
+</script>
+</body>
+</html>

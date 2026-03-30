@@ -1,0 +1,450 @@
+{
+  "schema_version": "1.0",
+  "categories": {
+    "insider_private": {"label": "私人消息", "color": "#FF6B6B"},
+    "public_corporate": {"label": "企業公告", "color": "#4ECDC4"},
+    "public_macro": {"label": "宏觀事件", "color": "#FFD93D"},
+    "public_policy": {"label": "政策法規", "color": "#6C5CE7"},
+    "public_legal": {"label": "法律訴訟", "color": "#FF9500"}
+  },
+  "source_types": ["private", "news", "government", "company_ir", "social_media", "court_record"],
+  "cases": [
+    {
+      "case_id": "case_001",
+      "title": "李嘉誠撤資大陸",
+      "description": "2013-2020 年間李嘉誠旗下長實系持續出售大陸及香港核心資產，累計套現超千億港元，被視為「撤資中國」標誌性事件。",
+      "related_stocks": ["HKEX:0001", "HKEX:1113"],
+      "time_range": {"start": "2013-01-01", "end": "2021-01-01"},
+      "events": [
+        {
+          "event_id": "evt_001",
+          "date": "2013-08-29",
+          "title": "出售廣州西城都薈商場",
+          "description": "長實系出售廣州西城都薈商場及停車場予離岸買家，約 30 億港元。輿論首次大規模關注「李嘉誠撤資」。",
+          "category": "public_corporate",
+          "source_type": "news",
+          "source_url": "https://topics.caixin.com/likashing/",
+          "expected_impact": "negative",
+          "confidence": 0.7,
+          "tags": ["asset_disposal", "real_estate", "mainland_china"],
+          "metadata": {
+            "deal_value_hkd": 3000000000,
+            "asset_type": "commercial_property"
+          }
+        },
+        {
+          "event_id": "evt_002",
+          "date": "2013-10-18",
+          "title": "出售上海陸家嘴東方匯經中心",
+          "description": "長實系出售上海陸家嘴東方匯經中心，約 70 億港元，撤資規模升級。",
+          "category": "public_corporate",
+          "source_type": "news",
+          "source_url": "https://topics.caixin.com/likashing/",
+          "expected_impact": "negative",
+          "confidence": 0.75,
+          "tags": ["asset_disposal", "real_estate", "mainland_china"],
+          "metadata": {
+            "deal_value_hkd": 7000000000,
+            "asset_type": "commercial_property"
+          }
+        },
+        {
+          "event_id": "evt_003",
+          "date": "2014-03-21",
+          "title": "屈臣氏 25% 股權出售予淡馬錹",
+          "description": "和記黃埔將屈臣氏約 25% 股權出售予新加坡淡馬錫，套現 440 億港元，為當時亞洲最大零售交易之一。",
+          "category": "public_corporate",
+          "source_type": "company_ir",
+          "source_url": "https://www.reuters.com/article/us-hutchison-whampoa-temasek-idUSKBN0MH0FN20150321",
+          "expected_impact": "neutral",
+          "confidence": 0.8,
+          "tags": ["asset_disposal", "retail", "strategic"],
+          "metadata": {
+            "deal_value_hkd": 44000000000,
+            "buyer": "Temasek Holdings"
+          }
+        },
+        {
+          "event_id": "evt_004",
+          "date": "2015-01-09",
+          "title": "長實和黃合併重組，遷冊開曼",
+          "description": "長江實業與和記黃埔宣布合併重組為 CK Hutchison (0001.HK) + CK Asset (1113.HK)，註冊地由香港遷至開曼群島。被解讀為「撤離香港」的標誌。",
+          "category": "public_corporate",
+          "source_type": "company_ir",
+          "source_url": "https://www.reuters.com/article/us-cheung-kong-ck-hutchison-idUSKBN0KI0GZ20150109",
+          "expected_impact": "negative",
+          "confidence": 0.85,
+          "tags": ["restructuring", "redomicile", "cayman_islands"],
+          "metadata": {
+            "event_type": "corporate_restructuring",
+            "significance": "landmark"
+          }
+        },
+        {
+          "event_id": "evt_005",
+          "date": "2016-10-26",
+          "title": "出售上海世紀匯廣場 200 億港元",
+          "description": "長實地產以約 200 億港元出售上海世紀匯廣場，為上海歷來最大宗單一物業交易之一。",
+          "category": "public_corporate",
+          "source_type": "news",
+          "source_url": "https://www.scmp.com/business/companies/article/2030438/",
+          "expected_impact": "negative",
+          "confidence": 0.8,
+          "tags": ["asset_disposal", "real_estate", "mainland_china"],
+          "metadata": {
+            "deal_value_hkd": 20000000000,
+            "asset_type": "commercial_complex"
+          }
+        },
+        {
+          "event_id": "evt_006",
+          "date": "2017-11-01",
+          "title": "出售中環中心 402 億港元",
+          "description": "CK Asset 以 402 億港元出售香港中環中心 75% 權益，為香港史上最大單一商廈交易。李嘉誠撤資達到高峰。",
+          "category": "public_corporate",
+          "source_type": "news",
+          "source_url": "https://www.scmp.com/business/article/2119633/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["asset_disposal", "real_estate", "hong_kong", "landmark_deal"],
+          "metadata": {
+            "deal_value_hkd": 40200000000,
+            "asset_type": "grade_a_office",
+            "significance": "largest_single_building_deal_hk"
+          }
+        },
+        {
+          "event_id": "evt_007",
+          "date": "2018-03-16",
+          "title": "李嘉誠宣布退休",
+          "description": "90 歲的李嘉誠正式宣布退休，長子李澤鉅接任長和系主席。標誌一個時代的結束。",
+          "category": "public_corporate",
+          "source_type": "company_ir",
+          "source_url": "https://www.reuters.com/article/us-ck-hutchison-li-ka-shing-idUSKCN1GS0N8",
+          "expected_impact": "negative",
+          "confidence": 0.85,
+          "tags": ["executive_change", "founder_retirement", "succession"],
+          "metadata": {
+            "person": "李嘉誠",
+            "person_level": "founder_chairman",
+            "successor": "李澤鉅"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "case_002",
+      "title": "杜軍內幕交易案（港史最長刑期）",
+      "description": "摩根士丹利亞洲前董事總經理杜軍，在擔任中信資源收購哈薩克石油資產的顧問期間，利用內幕消息獲利 2,330 萬港元，被判 7 年監禁。",
+      "related_stocks": ["HKEX:1205"],
+      "time_range": {"start": "2007-01-01", "end": "2010-01-01"},
+      "events": [
+        {
+          "event_id": "evt_010",
+          "date": "2007-09-17",
+          "title": "杜軍開始透過親屬帳戶買入中信資源",
+          "description": "杜軍在擔任中信資源收購哈薩克石油資產交易的財務顧問期間，透過妻子及親屬帳戶秘密買入中信資源股票及認股權證。（事後法庭調查確認的時間點）",
+          "category": "insider_private",
+          "source_type": "court_record",
+          "source_url": "https://legalref.judiciary.hk/",
+          "expected_impact": "positive",
+          "confidence": 0.95,
+          "tags": ["insider_trading", "stock_purchase", "advisory_role"],
+          "metadata": {
+            "person": "杜軍 (Du Jun)",
+            "person_level": "managing_director",
+            "company": "Morgan Stanley Asia",
+            "profit_hkd": 23300000
+          }
+        },
+        {
+          "event_id": "evt_011",
+          "date": "2007-11-12",
+          "title": "中信資源宣布收購哈薩克石油資產",
+          "description": "中信資源正式公告收購哈薩克斯坦 Karazhanbas 油田權益，交易金額約 19.1 億美元。消息公布後股價急漲約 50%。",
+          "category": "public_corporate",
+          "source_type": "company_ir",
+          "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2007/",
+          "expected_impact": "positive",
+          "confidence": 0.95,
+          "tags": ["acquisition", "oil_gas", "kazakhstan"],
+          "metadata": {
+            "deal_value_usd": 1910000000,
+            "target_asset": "Karazhanbas oil field"
+          }
+        },
+        {
+          "event_id": "evt_012",
+          "date": "2009-03-27",
+          "title": "杜軍被判 10 項內幕交易罪全部成立",
+          "description": "香港區域法院裁定杜軍 10 項內幕交易罪名全部成立，判處入獄 7 年，為香港史上最長內幕交易刑期。另沒收全部不當利潤 2,330 萬港元。",
+          "category": "public_legal",
+          "source_type": "court_record",
+          "source_url": "https://www.sfc.hk/en/News-and-announcements/Policy-statements-and-announcements/enforcement-news/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["conviction", "imprisonment", "sfc_enforcement"],
+          "metadata": {
+            "sentence_years": 7,
+            "charges": 10,
+            "case_number": "DCCC 830/2008",
+            "significance": "longest_insider_trading_sentence_hk"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "case_003",
+      "title": "Tiger Asia 配售內幕交易案",
+      "description": "美國對沖基金 Tiger Asia 在擔任建設銀行配股代理期間，提前獲悉配股折讓訊息並沽空獲利，SFC 透過民事程序追討，終審法院裁定具里程碑意義。",
+      "related_stocks": ["HKEX:0939"],
+      "time_range": {"start": "2008-06-01", "end": "2011-01-01"},
+      "events": [
+        {
+          "event_id": "evt_020",
+          "date": "2008-12-31",
+          "title": "Tiger Asia 在建行配股前沽空",
+          "description": "Tiger Asia 在知悉建設銀行即將進行大規模配股（折讓配售）後，於配股公告前沽空建行股票。配股公告後股價下跌，Tiger Asia 獲利。",
+          "category": "insider_private",
+          "source_type": "court_record",
+          "source_url": "https://www.sfc.hk/en/News-and-announcements/Policy-statements-and-announcements/Tiger-Asia",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["insider_trading", "short_selling", "placement"],
+          "metadata": {
+            "fund": "Tiger Asia Management LLC",
+            "profit_hkd": 38500000,
+            "strategy": "short_before_placement"
+          }
+        },
+        {
+          "event_id": "evt_021",
+          "date": "2009-01-07",
+          "title": "建設銀行宣布配股",
+          "description": "中國建設銀行正式公告折讓配股，股價從約 HK$4.2 跌至 HK$3.7（約 -12%）。",
+          "category": "public_corporate",
+          "source_type": "company_ir",
+          "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2009/",
+          "expected_impact": "negative",
+          "confidence": 0.95,
+          "tags": ["placement", "dilution", "share_offering"],
+          "metadata": {
+            "price_drop_pct": -12
+          }
+        },
+        {
+          "event_id": "evt_022",
+          "date": "2013-07-18",
+          "title": "終審法院裁定 SFC 民事追討權成立",
+          "description": "香港終審法院在 FACV 15/2012 案中裁定 SFC 有權透過《證券及期貨條例》S.213 以民事程序向 Tiger Asia 追討不當利潤。Tiger Asia 被令交還利潤 + 罰款合計約 4,530 萬港元。此為 SFC 執法里程碑。",
+          "category": "public_legal",
+          "source_type": "court_record",
+          "source_url": "https://legalref.judiciary.hk/",
+          "expected_impact": "neutral",
+          "confidence": 0.85,
+          "tags": ["court_ruling", "sfc_enforcement", "landmark_case"],
+          "metadata": {
+            "penalty_hkd": 45300000,
+            "case_number": "FACV 15/2012",
+            "significance": "sfc_civil_enforcement_precedent"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "case_004",
+      "title": "中美貿易戰衝擊港股",
+      "description": "2018-2019 年中美貿易戰期間，恆指從 33,484 跌至 24,540（-26.7%），科技股受創最重，騰訊從 HK$476 跌至 HK$251（-47%）。",
+      "related_stocks": ["HKEX:0700", "INDEX:HSI"],
+      "time_range": {"start": "2017-06-01", "end": "2020-06-01"},
+      "events": [
+        {
+          "event_id": "evt_030",
+          "date": "2018-03-22",
+          "title": "Trump 簽署對華關稅備忘錄",
+          "description": "特朗普簽署備忘錄，計劃對約 500 億美元中國進口商品徵收關稅。恆指單日跌 2.5%，騰訊跌超 3%。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.reuters.com/article/us-usa-trade-china-timeline/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["tariff", "trade_war", "us_china"],
+          "metadata": {
+            "tariff_amount_usd": 50000000000,
+            "hsi_change_pct": -2.5
+          }
+        },
+        {
+          "event_id": "evt_031",
+          "date": "2018-06-15",
+          "title": "美方確認對華 500 億關稅清單",
+          "description": "白宮正式公布對華 500 億美元關稅清單，中方宣布同等規模反制。恆指單日跌 2.8%。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.reuters.com/article/us-usa-trade-china-timeline/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["tariff", "trade_war", "retaliation"],
+          "metadata": {
+            "hsi_change_pct": -2.8
+          }
+        },
+        {
+          "event_id": "evt_032",
+          "date": "2018-07-06",
+          "title": "首批 340 億美元關稅正式生效",
+          "description": "美國對中國 340 億美元商品正式加徵 25% 關稅，中美貿易戰正式開打。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.reuters.com/article/us-usa-trade-china-timeline/",
+          "expected_impact": "negative",
+          "confidence": 0.85,
+          "tags": ["tariff", "trade_war", "effective"],
+          "metadata": {
+            "tariff_rate": 0.25,
+            "tariff_amount_usd": 34000000000
+          }
+        },
+        {
+          "event_id": "evt_033",
+          "date": "2018-09-24",
+          "title": "追加 2000 億美元關稅",
+          "description": "美國對額外 2000 億美元中國商品加徵 10% 關稅（2019 年 5 月升至 25%），貿易戰全面升級。騰訊年內累計跌幅超 40%。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.reuters.com/article/us-usa-trade-china-timeline/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["tariff", "trade_war", "escalation"],
+          "metadata": {
+            "tariff_amount_usd": 200000000000,
+            "initial_rate": 0.10
+          }
+        },
+        {
+          "event_id": "evt_034",
+          "date": "2018-10-11",
+          "title": "全球拋售潮，恆指單日暴跌 3.5%",
+          "description": "貿易戰恐慌疊加美債利率飆升，全球股市同步暴跌。恆指單日跌 3.5%，騰訊跌至 HK$256，較年初高位腰斬近半。",
+          "category": "public_macro",
+          "source_type": "news",
+          "source_url": "https://www.reuters.com/article/global-markets/",
+          "expected_impact": "negative",
+          "confidence": 0.95,
+          "tags": ["selloff", "global_panic", "bond_yields"],
+          "metadata": {
+            "hsi_change_pct": -3.5,
+            "tencent_ytd_change_pct": -47
+          }
+        },
+        {
+          "event_id": "evt_035",
+          "date": "2019-12-13",
+          "title": "中美第一階段貿易協議達成",
+          "description": "中美宣布達成第一階段貿易協議，暫停部分關稅升級。市場反彈，恆指回升至 27,500 附近。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.reuters.com/article/us-usa-trade-china-deal/",
+          "expected_impact": "positive",
+          "confidence": 0.85,
+          "tags": ["trade_deal", "de-escalation", "market_relief"],
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "case_id": "case_005",
+      "title": "2015 人民幣貶值 Black Monday",
+      "description": "2015 年 8 月人行意外讓人民幣一次性貶值 1.9%，觸發全球恐慌。恆指從 28,588 跌至 20,556（-28.1%），港交所股價腰斬。",
+      "related_stocks": ["HKEX:0388", "INDEX:HSI"],
+      "time_range": {"start": "2015-01-01", "end": "2017-01-01"},
+      "events": [
+        {
+          "event_id": "evt_040",
+          "date": "2015-04-08",
+          "title": "恆指升至 28,588 年內高位",
+          "description": "受滬港通概念及 A 股牛市帶動，恆指升至 28,588 點，港交所日均成交額屢創新高。",
+          "category": "public_macro",
+          "source_type": "news",
+          "source_url": "https://www.hsi.com.hk/eng/indexes/all-indexes/hsi",
+          "expected_impact": "positive",
+          "confidence": 0.8,
+          "tags": ["bull_market", "stock_connect", "a_share_rally"],
+          "metadata": {
+            "hsi_level": 28588
+          }
+        },
+        {
+          "event_id": "evt_041",
+          "date": "2015-06-12",
+          "title": "A 股見頂，上證指數 5178 點",
+          "description": "上證指數觸及 5178 點歷史高位後開始暴跌，三週內跌去 30%。A 股泡沫破裂開始波及港股。",
+          "category": "public_macro",
+          "source_type": "news",
+          "source_url": "https://www.reuters.com/article/us-china-markets/",
+          "expected_impact": "negative",
+          "confidence": 0.9,
+          "tags": ["a_share_crash", "bubble_burst", "contagion"],
+          "metadata": {
+            "sse_composite_peak": 5178
+          }
+        },
+        {
+          "event_id": "evt_042",
+          "date": "2015-08-11",
+          "title": "人行意外讓人民幣貶值 1.9%",
+          "description": "中國人民銀行調整人民幣中間價形成機制，人民幣兌美元一次性貶值約 1.9%。全球市場恐慌，恆指單日跌 1.9%，港交所跌超 4%。",
+          "category": "public_policy",
+          "source_type": "government",
+          "source_url": "https://www.bloomberg.com/news/articles/2015-08-11/",
+          "expected_impact": "negative",
+          "confidence": 0.95,
+          "tags": ["currency_devaluation", "rmb", "pboc", "shock"],
+          "metadata": {
+            "rmb_devaluation_pct": -1.9,
+            "hsi_change_pct": -1.9
+          }
+        },
+        {
+          "event_id": "evt_043",
+          "date": "2015-08-24",
+          "title": "Black Monday — 恆指單日暴跌 5.2%",
+          "description": "全球黑色星期一，恆指單日暴跌 5.2%（逾 1,400 點），為多年來最大單日跌幅。港交所 (0388.HK) 從年初 HK$310 已跌至 HK$185 附近（-40%）。",
+          "category": "public_macro",
+          "source_type": "news",
+          "source_url": "https://www.bloomberg.com/news/articles/2015-08-24/",
+          "expected_impact": "negative",
+          "confidence": 0.95,
+          "tags": ["black_monday", "global_selloff", "panic"],
+          "metadata": {
+            "hsi_change_pct": -5.2,
+            "hsi_points_drop": 1400
+          }
+        }
+      ]
+    }
+  ],
+  "_input_template": {
+    "_comment": "以下為未來私人消息輸入格式範本，供 CEO 團隊參考",
+    "event_id": "evt_XXX",
+    "date": "YYYY-MM-DD",
+    "title": "事件標題（20字內）",
+    "description": "詳細描述，含人物/金額/影響",
+    "category": "insider_private | public_corporate | public_macro | public_policy | public_legal",
+    "source_type": "private | news | government | company_ir | social_media | court_record",
+    "source_url": "https://... 或留空",
+    "related_stocks": ["EXCHANGE:CODE"],
+    "expected_impact": "negative | positive | neutral",
+    "confidence": "0-1 浮點數，主觀信心度",
+    "tags": ["關鍵字陣列"],
+    "metadata": {
+      "_comment": "彈性欄位，依事件類型填寫",
+      "person": "相關人物",
+      "person_level": "founder | c_suite | vp | director | manager",
+      "company_market_cap_hkd": 0,
+      "business_segment_ratio": "0-1 該事件涉及業務占總營收比",
+      "deal_value_hkd": 0,
+      "event_scale": "small | medium | large | landmark"
+    }
+  }
+}
