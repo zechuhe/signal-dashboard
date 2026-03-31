@@ -1,2 +1,8 @@
 *.bak_*
 .hkex_stock_cache.json
+.env
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+node_modules/
