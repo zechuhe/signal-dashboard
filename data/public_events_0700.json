@@ -1,0 +1,338 @@
+{
+  "fetch_info": {
+    "stock": "0700",
+    "from": "2026-03-24",
+    "to": "2026-03-31",
+    "sources": [
+      "hkex",
+      "google",
+      "eastmoney"
+    ],
+    "fetched_at": "2026-03-31T08:24:04.956942",
+    "count": 14
+  },
+  "events": [
+    {
+      "event_id": "hkex_12077722",
+      "date": "2026-03-30",
+      "title": "翌日披露報表 - [其他 &#x2f; 股份購回]",
+      "description": "翌日披露報表 - [其他 &#x2f; 股份購回]",
+      "category": "public_corporate",
+      "source_type": "company_ir",
+      "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033001097_c.pdf",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.6,
+      "tags": [
+        "hkex_filing",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "HKEX News",
+        "file_type": "PDF",
+        "fetched_at": "2026-03-31T08:24:01.321003"
+      }
+    },
+    {
+      "event_id": "gnews_2210620741",
+      "date": "2026-03-30",
+      "title": "Tencent (00700.HK) repurchased",
+      "description": "Tencent (00700.HK) repurchased 624,000 shares at a cost of HKD 301 million on March 30. - 富途牛牛\n\nTencent (00700.HK) repurchased 624,000 shares at a cost of HKD 301 million on March 30.&nbsp;&nbsp;富途牛牛",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNbTRwd0tuZl9QZXE0UTQtVWRldll3NWVYUERpOGZzbHhvanFoNFRuaU8xeERvUVM1R0hOOTU2N3loTE1BWkFjeENIS3RjdVY5VlBSdmotZ25waGg5VEdIcmdueTJtTk4tRlVnZEFtdHlZX2hRbmEzWmdPR1JNT184QW44UVNYdWg0WFIzaDZ1YjNicWdfSEJtN29WQ1Y?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "Tencent (00700.HK) repurchased 624,000 shares at a cost of HKD 301 million on March 30. - 富途牛牛",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "hkex_12072460",
+      "date": "2026-03-27",
+      "title": "翌日披露報表 - [股份購回]",
+      "description": "翌日披露報表 - [股份購回]",
+      "category": "public_corporate",
+      "source_type": "company_ir",
+      "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032701307_c.pdf",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.6,
+      "tags": [
+        "hkex_filing",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "HKEX News",
+        "file_type": "PDF",
+        "fetched_at": "2026-03-31T08:24:01.321003"
+      }
+    },
+    {
+      "event_id": "gnews_641963013",
+      "date": "2026-03-27",
+      "title": "《AI》騰訊控股(00700.HK)出現「死亡交叉」技術圖表",
+      "description": "《AI》騰訊控股(00700.HK)出現「死亡交叉」技術圖表形態 - AASTOCKS.com\n\n《AI》騰訊控股(00700.HK)出現「死亡交叉」技術圖表形態&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOODhOcmNwZktsWWZNX3JoUm91ZExRcEFwTlltRmJ4UmEycW1RMWQ2NDhCR2xQQjVKSkdEX0lQaTUyZW1tMzdhVUNoRjZqT2Q0d3E1N0duWm01TXJUbkFoemd0NDYtd1p3VkR4UEcyZ2xheFpiTzRFYkhGUFBXZHo1REVDcFI2Q1NOcDBuUmEtZHJheWs?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《AI》騰訊控股(00700.HK)出現「死亡交叉」技術圖表形態 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_8577632720",
+      "date": "2026-03-27",
+      "title": "《大行》野村降騰訊(00700.HK)目標價至727元 因A",
+      "description": "《大行》野村降騰訊(00700.HK)目標價至727元 因AI投資加大下調淨利潤預測 - AASTOCKS.com\n\n《大行》野村降騰訊(00700.HK)目標價至727元 因AI投資加大下調淨利潤預測&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQWll3cDBCbjlac0toejczY2RpcXhCbVRrZy10U3VISzlIMkFXQ2JDbFlJWnNHbEVQanNkZG1uVl9kNF8ybVlhaldQWHJQbnh4SjBUc0dtaF9laXljNi1WZ1R3VmxSaGZ1UnhTalRCSnY1ZnVCZGp1OXRPb0pBY0I4UUlfc0NrVEVVbGZPS2V4c3VBOEdyMHRB?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》野村降騰訊(00700.HK)目標價至727元 因AI投資加大下調淨利潤預測 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "hkex_12069283",
+      "date": "2026-03-26",
+      "title": "翌日披露報表 - [其他 &#x2f; 股份購回]",
+      "description": "翌日披露報表 - [其他 &#x2f; 股份購回]",
+      "category": "public_corporate",
+      "source_type": "company_ir",
+      "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601125_c.pdf",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.6,
+      "tags": [
+        "hkex_filing",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "HKEX News",
+        "file_type": "PDF",
+        "fetched_at": "2026-03-31T08:24:01.321003"
+      }
+    },
+    {
+      "event_id": "hkex_12067502",
+      "date": "2026-03-25",
+      "title": "公告及通告 - [股份計劃]",
+      "description": "公告及通告 - [股份計劃]",
+      "category": "public_corporate",
+      "source_type": "company_ir",
+      "source_url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501846_c.pdf",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.6,
+      "tags": [
+        "hkex_filing",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "HKEX News",
+        "file_type": "PDF",
+        "fetched_at": "2026-03-31T08:24:01.321003"
+      }
+    },
+    {
+      "event_id": "gnews_4063753419",
+      "date": "2026-03-25",
+      "title": "《大行》摩通：騰訊(00700.HK)AI變現邏輯改善 重申",
+      "description": "《大行》摩通：騰訊(00700.HK)AI變現邏輯改善 重申目標價690元 - AASTOCKS.com\n\n《大行》摩通：騰訊(00700.HK)AI變現邏輯改善 重申目標價690元&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPSC1jVVI4U2xZVm56cUtpSWliNk1PUVgxR0RWUVh5Z2l2WS1jYWFZbzJNWEtQeGVXRDVlS21oOUxGTW9yQ3FSY29iRWgwNmR1V1MwMmdkVUkzU29yZ0FkQ1dLN1ZiaE8xbXdWNHh2MzJGVEIyRGhEZmdnMGlrX0lfcXZJSXFDRGZzZTVzZThjc29RNHpLV2c?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》摩通：騰訊(00700.HK)AI變現邏輯改善 重申目標價690元 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_604875273",
+      "date": "2026-03-23",
+      "title": "《大行》美銀證券：騰訊(00700.HK)估值重估路徑清晰 ",
+      "description": "《大行》美銀證券：騰訊(00700.HK)估值重估路徑清晰 重申「買入」評級 - AASTOCKS.com\n\n《大行》美銀證券：騰訊(00700.HK)估值重估路徑清晰 重申「買入」評級&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQQVdkRko4cXhYYkQ5dWhiMTNLT1RPbVAyamFFWVREUHRmcUUyYWlnMkZ2a2pDdzN0ZjRIUjFCdkZJRjVxUTlicE5OVkJfR0pqa0RNR2E0N0dDaTl4MEhwNlNUTkVhUTFrRnFVcUc2dmRWQmpCUVV2MFlhdzNoVGxYN0tmYzRhZTRveVRNUVJaWE15WUFYeDdjSg?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》美銀證券：騰訊(00700.HK)估值重估路徑清晰 重申「買入」評級 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_3982090437",
+      "date": "2026-03-23",
+      "title": "《大行》富瑞：騰訊(00700.HK)第一季廣告業務穩健增長",
+      "description": "《大行》富瑞：騰訊(00700.HK)第一季廣告業務穩健增長 - AASTOCKS.com\n\n《大行》富瑞：騰訊(00700.HK)第一季廣告業務穩健增長&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQeVdVMUxkbUQ1T1dmV0pxQTNtRjdRX0wwRXl5VTVQbnZEajd6djBvRnFjUlVUcVUxOWpMTmVyMm1zODJkYnppV0hhanA4OWJ1VU5wWVA4ck9Rajh2TjhKLXJEWTA0ZWstQzhBUnRhU2c5TzJHY3BnQ1NxaURfX2xJRW5BYnVSVU9FdkJSV3E4ZXd2S0l5N1NlYWxB?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》富瑞：騰訊(00700.HK)第一季廣告業務穩健增長 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_1994530093",
+      "date": "2026-03-23",
+      "title": "《大行》瑞銀：騰訊(00700.HK)AI投資為長期增長鋪路",
+      "description": "《大行》瑞銀：騰訊(00700.HK)AI投資為長期增長鋪路 重申「買入」評級 - AASTOCKS.com\n\n《大行》瑞銀：騰訊(00700.HK)AI投資為長期增長鋪路 重申「買入」評級&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNQ2hUZzZ6cEJKUkQyN0lOOGhmdEExTnoxOVFONzZkdndCUjZuVXFoWWNzWjBkRmxvZDJ5bURwSVNVYlN1VmxySDhPMk9EVzR2YzY0WGNrLS1nYVR5NkhfMVRwUnRyQ1pwTWlvbm9INi01RE0wN1JWSmRUcy14bjhScVhhMHRveTk0THlsUlpncmNjaDdTaFE?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》瑞銀：騰訊(00700.HK)AI投資為長期增長鋪路 重申「買入」評級 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_1344926739",
+      "date": "2026-03-19",
+      "title": "《大行》麥格理：騰訊(00700.HK)短期盈利提升空間有限",
+      "description": "《大行》麥格理：騰訊(00700.HK)短期盈利提升空間有限 目標價降至559元 - AASTOCKS.com\n\n《大行》麥格理：騰訊(00700.HK)短期盈利提升空間有限 目標價降至559元&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxObTBrWHNBNkJZNC1aMVpZSDFseDZnaHBuLU5EV3lYeFVkWHNYTlpkc0hlM3FicE9mVU5hZ0VYMTZ0MU5OMlVibk1pRm9xUkdnQURxdjZNWnpwdEJ4angyS0VNejVFOU1aeHhvQlJoR2dKdVVrZDB6ZVNyNWtEaHB3b296MFR1VVE1LXQyRmRtRG13OEVuQk9n?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》麥格理：騰訊(00700.HK)短期盈利提升空間有限 目標價降至559元 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_20276067",
+      "date": "2026-03-19",
+      "title": "《大行》摩通：騰訊(00700.HK)業績反映AI展現具體商",
+      "description": "《大行》摩通：騰訊(00700.HK)業績反映AI展現具體商業價值 目標價750元籲「增持」 - AASTOCKS.com\n\n《大行》摩通：騰訊(00700.HK)業績反映AI展現具體商業價值 目標價750元籲「增持」&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQeEotLXhVeHR2Z1AyVmpXQ1JXaEp0ejBuVUJqNkFULXZDR1hRelg2eWNnSDFGUWhmaG9UVnp5V3I4amc5b2lzYWp3OXRvRnNxZEpjMDdUaXlWMllIa3lnbzJEMDhldC1mODR5bmEyZ1kzNGU1SVRKXzNjTkE4RkQyUnhrNUlQc2ZyWHNsZi1FMmZLajNTUmc?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《大行》摩通：騰訊(00700.HK)業績反映AI展現具體商業價值 目標價750元籲「增持」 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    },
+    {
+      "event_id": "gnews_6738420236",
+      "date": "2026-03-18",
+      "title": "《藍籌》騰訊(00700.HK)去年末季non-IFRS經調",
+      "description": "《藍籌》騰訊(00700.HK)去年末季non-IFRS經調整純利增17%至646.94億人幣 符預期 - AASTOCKS.com\n\n《藍籌》騰訊(00700.HK)去年末季non-IFRS經調整純利增17%至646.94億人幣 符預期&nbsp;&nbsp;AASTOCKS.com",
+      "category": "public_macro",
+      "source_type": "news",
+      "source_url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOQVJWWXF0eFp1ME9lX3NQR3RqODdLZ1g5WGp4WUZnZ3V0ZFBIeXFMZHhRNTQtYlUxYko3OVNiZ2JUZUp2emw2X2h1UDBiNGJfRUt1QjhMN281UEh4YUQycHpuaEdmbHRSbWpJTy1JWC1NUlZfRHJNZHFtYW53dlR6a091YkpicVlkT1dQcUtSN3BQdktsTFE?oc=5",
+      "related_stocks": [
+        "HKEX:00700"
+      ],
+      "expected_impact": "neutral",
+      "confidence": 0.5,
+      "tags": [
+        "google_news",
+        "auto_fetched"
+      ],
+      "metadata": {
+        "source": "Google News",
+        "original_title": "《藍籌》騰訊(00700.HK)去年末季non-IFRS經調整純利增17%至646.94億人幣 符預期 - AASTOCKS.com",
+        "fetched_at": "2026-03-31T08:24:03.286889"
+      }
+    }
+  ]
+}

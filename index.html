@@ -306,6 +306,7 @@ body {
   <div style="display:flex;gap:8px;align-items:center;">
     <button class="btn btn-primary" onclick="openAddForm()">+ 新增私人消息</button>
     <button class="btn btn-export" onclick="exportUserEvents()">匯出 JSON</button>
+    <label class="btn" style="cursor:pointer;">載入事件 <input type="file" accept=".json" style="display:none" onchange="importEvents(this)"></label>
     <span style="font-size:11px;color:var(--text-secondary);">v2.0</span>
   </div>
 </div>
@@ -1103,14 +1104,44 @@ function updateUserEventCount() {
   el.textContent = count > 0 ? `${count} 則私人消息` : '';
 }
 
-// Merge user events into case events for rendering
+// Merge user events + imported events into case events for rendering
 function getMergedEvents(caseData) {
   const userEvents = getUserEvents();
   const caseStocks = new Set(caseData.related_stocks);
   const relevantUserEvents = userEvents.filter(e =>
     e.related_stocks.some(s => caseStocks.has(s))
   );
-  return [...caseData.events, ...relevantUserEvents];
+  const relevantImported = importedEvents.filter(e =>
+    (e.related_stocks || []).some(s => caseStocks.has(s))
+  );
+  return [...caseData.events, ...relevantUserEvents, ...relevantImported];
+}
+
+// ===== Import External Events =====
+let importedEvents = [];
+
+function importEvents(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Support both formats: {events: [...]} or [...] or {cases: [{events: [...]}]}
+      let events = [];
+      if (Array.isArray(data)) events = data;
+      else if (data.events) events = data.events;
+      else if (data.cases) data.cases.forEach(c => events.push(...(c.events || [])));
+
+      importedEvents = events;
+      alert(`已載入 ${events.length} 則外部事件`);
+      selectCase(currentCaseIdx);
+    } catch (err) {
+      alert('JSON 解析失敗: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
 // ===== Category Filter =====

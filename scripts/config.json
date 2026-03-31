@@ -1,0 +1,60 @@
+{
+  "_comment": "Signal Dashboard P3 — 外部 API 端點配置。禁止 hardcode 在腳本中。",
+  "sources": {
+    "hkex": {
+      "name": "HKEX News (港交所公告)",
+      "enabled": true,
+      "endpoints": {
+        "search": "https://www1.hkexnews.hk/search/titleSearchServlet.do",
+        "stock_list": "https://www1.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json",
+        "file_base": "https://www1.hkexnews.hk"
+      },
+      "defaults": {
+        "market": "SEHK",
+        "lang": "ZH",
+        "row_range": 20,
+        "document_type": -1
+      }
+    },
+    "google_news": {
+      "name": "Google News RSS",
+      "enabled": true,
+      "endpoints": {
+        "rss": "https://news.google.com/rss/search"
+      },
+      "defaults": {
+        "hl": "zh-TW",
+        "gl": "HK",
+        "ceid": "HK:zh-Hant"
+      }
+    },
+    "eastmoney": {
+      "name": "Eastmoney (東方財富)",
+      "enabled": true,
+      "endpoints": {
+        "search": "https://search-api-web.eastmoney.com/search/jsonp",
+        "kline": "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+      },
+      "defaults": {
+        "page_size": 10,
+        "hk_secid_prefix": "116"
+      }
+    }
+  },
+  "stock_code_mapping": {
+    "_comment": "Yahoo Finance ticker 後綴對照，用於 yfinance 拉取股價",
+    "HKEX": ".HK",
+    "NYSE": "",
+    "NASDAQ": "",
+    "TWSE": ".TW",
+    "TPEx": ".TWO",
+    "SSE": ".SS",
+    "SZSE": ".SZ"
+  },
+  "fetch_settings": {
+    "request_delay_sec": 1.0,
+    "max_retries": 3,
+    "timeout_sec": 15,
+    "user_agent": "SignalDashboard/1.0"
+  }
+}
