@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消息面×股價關聯分析 Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+/* ===== Futu-inspired Dark Theme ===== */
+:root {
+  --bg: #1B1B1F;
+  --panel-bg: #232328;
+  --grid-line: #2A2A2E;
+  --up-color: #F04848;
+  --down-color: #00B07C;
+  --text-primary: #E8E8E8;
+  --text-secondary: #888888;
+  --accent: #3B82F6;
+  --ma5: #C0A254;
+  --ma10: #E091EB;
+  --ma20: #6FBAFF;
+  --ma60: #44CE7A;
+  --border: #333338;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+.header h1 {
+  font-size: 16px; font-weight: 600;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header .subtitle { font-size: 12px; color: var(--text-secondary); margin-left: 12px; }
+
+/* ===== Case Tabs ===== */
+.case-tabs {
+  display: flex; gap: 0; padding: 0 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.case-tab {
+  padding: 10px 16px; cursor: pointer;
+  font-size: 13px; color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap; transition: all 0.2s;
+  user-select: none;
+}
+.case-tab:hover { color: var(--text-primary); }
+.case-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+/* ===== Stock Info Bar ===== */
+.stock-info {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 12px 20px 4px;
+  flex-wrap: wrap;
+}
+.stock-name { font-size: 18px; font-weight: 700; }
+.stock-code { font-size: 13px; color: var(--text-secondary); }
+.stock-price { font-size: 22px; font-weight: 700; margin-left: 8px; }
+.stock-change { font-size: 14px; margin-left: 4px; }
+.stock-meta { font-size: 12px; color: var(--text-secondary); }
+.price-up { color: var(--up-color); }
+.price-down { color: var(--down-color); }
+
+/* ===== Time Range Buttons ===== */
+.time-range {
+  display: flex; gap: 2px; padding: 4px 20px 8px;
+}
+.range-btn {
+  padding: 4px 10px; font-size: 12px;
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: 4px;
+  cursor: pointer; transition: all 0.15s;
+}
+.range-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.range-btn.active {
+  color: #fff; background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ===== Chart Container ===== */
+#chart-container {
+  width: 100%; height: calc(100vh - 240px);
+  min-height: 500px;
+}
+
+/* ===== Event Panel (Side) ===== */
+.event-panel {
+  position: fixed; right: -420px; top: 0; bottom: 0;
+  width: 400px; background: var(--panel-bg);
+  border-left: 1px solid var(--border);
+  z-index: 100; transition: right 0.3s ease;
+  overflow-y: auto; padding: 0;
+}
+.event-panel.open { right: 0; }
+.event-panel-header {
+  position: sticky; top: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+.event-panel-header h3 { font-size: 15px; font-weight: 600; }
+.event-panel-close {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text-secondary); cursor: pointer; font-size: 16px;
+}
+.event-panel-close:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.event-detail { padding: 16px 20px; }
+.event-detail .field { margin-bottom: 12px; }
+.event-detail .field-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.event-detail .field-value { font-size: 14px; line-height: 1.5; }
+.event-tag {
+  display: inline-block; padding: 2px 8px; margin: 2px 4px 2px 0;
+  font-size: 11px; border-radius: 3px;
+  background: rgba(59,130,246,0.15); color: var(--accent);
+}
+.event-source-link {
+  color: var(--accent); text-decoration: none; word-break: break-all;
+}
+.event-source-link:hover { text-decoration: underline; }
+.event-impact {
+  display: inline-block; padding: 2px 10px; border-radius: 3px;
+  font-size: 12px; font-weight: 600;
+}
+.impact-negative { background: rgba(240,72,72,0.15); color: var(--up-color); }
+.impact-positive { background: rgba(0,176,124,0.15); color: var(--down-color); }
+.impact-neutral { background: rgba(136,136,136,0.15); color: var(--text-secondary); }
+
+/* ===== Overlay ===== */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ===== Category Filter (replaces legend) ===== */
+.legend {
+  display: flex; gap: 12px; padding: 8px 20px;
+  flex-wrap: wrap; align-items: center;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-secondary);
+  cursor: pointer; user-select: none; transition: opacity 0.15s;
+}
+.legend-item.off { opacity: 0.35; }
+.legend-item input { accent-color: var(--accent); cursor: pointer; }
+.legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ===== Event List Panel ===== */
+.event-list-toggle {
+  padding: 4px 20px; font-size: 12px;
+}
+.event-list-panel {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  background: var(--panel-bg); border-top: 1px solid var(--border);
+}
+.event-list-panel.open { max-height: 300px; overflow-y: auto; }
+.event-list-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.event-list-table th {
+  position: sticky; top: 0; background: var(--panel-bg);
+  text-align: left; padding: 6px 12px;
+  color: var(--text-secondary); font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+.event-list-table td {
+  padding: 5px 12px; border-bottom: 1px solid var(--grid-line);
+  color: var(--text-primary); vertical-align: middle;
+}
+.event-list-table tr:hover { background: rgba(59,130,246,0.05); }
+.evt-cat-dot {
+  display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; margin-right: 4px; vertical-align: middle;
+}
+.btn-xs {
+  padding: 2px 8px; font-size: 11px; border-radius: 3px;
+  cursor: pointer; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.btn-xs:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.btn-xs.btn-danger:hover { color: var(--up-color); border-color: var(--up-color); }
+
+/* ===== Footer ===== */
+.footer {
+  padding: 8px 20px;
+  font-size: 11px; color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* ===== Action Buttons ===== */
+.action-bar {
+  display: flex; gap: 8px; padding: 8px 20px;
+  align-items: center;
+}
+.btn {
+  padding: 6px 14px; font-size: 12px; border-radius: 4px;
+  cursor: pointer; transition: all 0.15s; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+}
+.btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.btn-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.btn-primary:hover { background: #2563eb; }
+.btn-export { background: rgba(76,205,196,0.15); color: #4ECDC4; border-color: #4ECDC4; }
+.user-event-count {
+  font-size: 11px; color: var(--text-secondary);
+  margin-left: auto;
+}
+
+/* ===== Form Modal ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--panel-bg); border-radius: 8px;
+  width: 480px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; border: 1px solid var(--border);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 16px 20px; }
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+}
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block; font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 4px; letter-spacing: 0.3px;
+}
+.form-label .required { color: var(--up-color); }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 8px 10px; font-size: 13px;
+  background: var(--bg); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 4px;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent);
+}
+.form-textarea { resize: vertical; min-height: 60px; }
+.form-row { display: flex; gap: 12px; }
+.form-row > .form-group { flex: 1; }
+.form-checkbox-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+}
+.form-checkbox-row input { accent-color: var(--accent); }
+.slider-wrapper { display: flex; align-items: center; gap: 8px; }
+.slider-wrapper input[type=range] {
+  flex: 1; accent-color: var(--accent);
+}
+.slider-value {
+  min-width: 36px; text-align: center;
+  font-size: 13px; color: var(--accent); font-weight: 600;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .stock-info { padding: 8px 12px 4px; gap: 8px; }
+  .stock-name { font-size: 15px; }
+  .stock-price { font-size: 18px; }
+  .event-panel { width: 100%; right: -100%; }
+  .case-tab { padding: 8px 12px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:baseline;">
+    <h1>Signal Dashboard</h1>
+    <span class="subtitle">消息面 × 股價關聯分析</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-primary" onclick="openAddForm()">+ 新增私人消息</button>
+    <button class="btn btn-export" onclick="exportUserEvents()">匯出 JSON</button>
+    <label class="btn" style="cursor:pointer;">載入事件 <input type="file" accept=".json" style="display:none" onchange="importEvents(this)"></label>
+    <label class="btn" style="cursor:pointer;background:rgba(147,51,234,0.15);color:#9333ea;border-color:#9333ea;">載入分析 <input type="file" accept=".json" style="display:none" onchange="importAnalysis(this)"></label>
+    <span style="font-size:11px;color:var(--text-secondary);">v2.0</span>
+  </div>
+</div>
+
+<div class="case-tabs" id="caseTabs"></div>
+
+<div class="stock-info" id="stockInfo"></div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+  <div class="time-range" id="timeRange"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="chart-container"></div>
+
+<div class="event-list-toggle">
+  <button class="btn" onclick="toggleEventList()" id="evtListBtn">顯示事件列表</button>
+</div>
+<div class="event-list-panel" id="eventListPanel">
+  <table class="event-list-table">
+    <thead><tr><th>日期</th><th>分類</th><th>標題</th><th>影響</th><th>信心</th><th>來源</th><th>操作</th></tr></thead>
+    <tbody id="eventListBody"></tbody>
+  </table>
+</div>
+
+<div class="footer">
+  Data source: Yahoo Finance (yfinance) | 事件資料僅供分析研究用途 |
+  <a href="https://github.com/zechuhe/signal-dashboard" target="_blank">GitHub</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="event-panel" id="eventPanel">
+  <div class="event-panel-header">
+    <h3 id="panelTitle">事件詳情</h3>
+    <button class="event-panel-close" onclick="closePanel()">&times;</button>
+  </div>
+  <div class="event-detail" id="panelContent"></div>
+</div>
+
+<!-- ===== Add Event Modal ===== -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>新增私人消息</h3>
+      <button class="event-panel-close" onclick="closeAddForm()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">關聯股票 <span class="required">*</span></label>
+        <select class="form-select" id="fmStock">
+          <option value="">— 請選擇 —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">事件標題 <span class="required">*</span>（30 字內）</label>
+        <input class="form-input" id="fmTitle" maxlength="30" placeholder="例：XX公司OO項目主管離職">
+      </div>
+      <div class="form-group">
+        <label class="form-label">事件描述 <span class="required">*</span></label>
+        <textarea class="form-textarea" id="fmDesc" placeholder="詳細描述消息內容、來源背景、可能影響..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">消息取得日期 <span class="required">*</span></label>
+          <input class="form-input" type="date" id="fmDateReceived">
+        </div>
+        <div class="form-group">
+          <label class="form-label">推測事件發生日期</label>
+          <input class="form-input" type="date" id="fmDateEvent" >
+          <div class="form-checkbox-row">
+            <input type="checkbox" id="fmDateUnknown" onchange="document.getElementById('fmDateEvent').disabled=this.checked">
+            <label for="fmDateUnknown">無法推測</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">預期影響 <span class="required">*</span></label>
+          <select class="form-select" id="fmImpact">
+            <option value="negative">利空</option>
+            <option value="positive">利好</option>
+            <option value="neutral">不確定</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">消息來源層級</label>
+          <select class="form-select" id="fmSourceLevel">
+            <option value="">— 選填 —</option>
+            <option value="board">董事會</option>
+            <option value="c_suite">高管 (C-Suite)</option>
+            <option value="vp">VP / 總監</option>
+            <option value="manager">中層主管</option>
+            <option value="industry">業界人脈</option>
+            <option value="internet">網路傳聞</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">信心度 <span class="required">*</span></label>
+        <div class="slider-wrapper">
+          <input type="range" id="fmConfidence" min="0" max="100" value="50" oninput="document.getElementById('fmConfVal').textContent=this.value+'%'">
+          <span class="slider-value" id="fmConfVal">50%</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAddForm()">取消</button>
+      <button class="btn btn-primary" onclick="submitEvent()">確認新增</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== State =====
+let allCases = [];
+let allPriceData = {};
+let currentCaseIdx = 0;
+let chart = null;
+const CATEGORY_COLORS = {};
+
+// ===== Data Loading =====
+async function loadJSON(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Failed to load ${url}: ${resp.status}`);
+  return resp.json();
+}
+
+async function init() {
+  // Load events
+  const eventsData = await loadJSON('data/events.json');
+  allCases = eventsData.cases;
+  Object.assign(CATEGORY_COLORS, Object.fromEntries(
+    Object.entries(eventsData.categories).map(([k, v]) => [k, v])
+  ));
+
+  // Build legend
+  buildLegend(eventsData.categories);
+
+  // Load all price files
+  const priceFiles = [
+    'price_HKEX_0001', 'price_HKEX_1113', 'price_HKEX_1205',
+    'price_HKEX_0939', 'price_HKEX_0700', 'price_HKEX_0388', 'price_INDEX_HSI'
+  ];
+  await Promise.all(priceFiles.map(async (f) => {
+    try {
+      const data = await loadJSON(`data/${f}.json`);
+      allPriceData[data.meta.symbol] = data;
+    } catch (e) { console.warn(`Skip ${f}: ${e.message}`); }
+  }));
+
+  // Init chart
+  chart = echarts.init(document.getElementById('chart-container'), null, { renderer: 'canvas' });
+  window.addEventListener('resize', () => chart.resize());
+
+  // Build tabs
+  buildCaseTabs();
+  selectCase(0);
+  updateUserEventCount();
+}
+
+let activeCategories = new Set();
+
+function buildLegend(categories) {
+  activeCategories = new Set(Object.keys(categories));
+  const el = document.getElementById('legend');
+  el.innerHTML = Object.entries(categories).map(([k, v]) =>
+    `<label class="legend-item" data-cat="${k}">
+      <input type="checkbox" checked onchange="toggleCategory('${k}', this.checked)">
+      <span class="legend-dot" style="background:${v.color}"></span>${v.label}
+    </label>`
+  ).join('');
+}
+
+function buildCaseTabs() {
+  const el = document.getElementById('caseTabs');
+  el.innerHTML = allCases.map((c, i) =>
+    `<div class="case-tab ${i === 0 ? 'active' : ''}" onclick="selectCase(${i})">${c.title}</div>`
+  ).join('');
+}
+
+// ===== Case Selection =====
+function selectCase(idx) {
+  currentCaseIdx = idx;
+  const c = allCases[idx];
+
+  // Update tab highlight
+  document.querySelectorAll('.case-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+
+  // Use first stock as primary
+  const primarySymbol = c.related_stocks[0];
+  const priceData = allPriceData[primarySymbol];
+
+  if (!priceData) {
+    document.getElementById('stockInfo').innerHTML = `<span style="color:var(--up-color)">Stock data not found: ${primarySymbol}</span>`;
+    return;
+  }
+
+  // Update stock info bar
+  updateStockInfo(priceData);
+
+  // Build time range buttons
+  buildTimeRange(priceData);
+
+  // Render chart
+  renderChart(c, priceData);
+}
+
+function updateStockInfo(priceData) {
+  const meta = priceData.meta;
+  const last = priceData.data[priceData.data.length - 1];
+  const isUp = last.change >= 0;
+  const cls = isUp ? 'price-up' : 'price-down';
+  const sign = isUp ? '+' : '';
+
+  document.getElementById('stockInfo').innerHTML = `
+    <span class="stock-name">${meta.name}</span>
+    <span class="stock-code">${meta.symbol} · ${meta.currency}</span>
+    <span class="stock-price ${cls}">${last.close.toFixed(meta.price_precision)}</span>
+    <span class="stock-change ${cls}">${sign}${last.change.toFixed(meta.price_precision)} (${sign}${last.change_pct.toFixed(2)}%)</span>
+    <span class="stock-meta">${last.date} · ${meta.exchange}</span>
+  `;
+}
+
+function buildTimeRange(priceData) {
+  const dataLen = priceData.data.length;
+  const ranges = [
+    { label: '3M', days: 63 },
+    { label: '6M', days: 126 },
+    { label: '1Y', days: 252 },
+    { label: '3Y', days: 756 },
+    { label: '全部', days: dataLen }
+  ];
+
+  const el = document.getElementById('timeRange');
+  el.innerHTML = ranges.map((r, i) =>
+    `<button class="range-btn ${r.days >= dataLen ? 'active' : ''}" onclick="setRange(${r.days}, this)">${r.label}</button>`
+  ).join('');
+
+  // Default: show all
+  el.querySelector('.range-btn:last-child').classList.add('active');
+}
+
+function setRange(days, btn) {
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const c = allCases[currentCaseIdx];
+  const priceData = allPriceData[c.related_stocks[0]];
+  const total = priceData.data.length;
+  const start = Math.max(0, Math.round((1 - days / total) * 100));
+
+  chart.dispatchAction({
+    type: 'dataZoom',
+    start: days >= total ? 0 : start,
+    end: 100
+  });
+}
+
+// ===== Chart Rendering =====
+function renderChart(caseData, priceData) {
+  const dates = priceData.data.map(d => d.date);
+  const closes = priceData.data.map(d => d.close);
+  const volumes = priceData.data.map(d => d.volume);
+  const opens = priceData.data.map(d => d.open);
+  const highs = priceData.data.map(d => d.high);
+  const lows = priceData.data.map(d => d.low);
+
+  // K-line data: [open, close, low, high]
+  const klineData = priceData.data.map(d => [d.open, d.close, d.low, d.high]);
+
+  // Volume colors
+  const volumeColors = priceData.data.map(d => d.close >= d.open ? '#F04848' : '#00B07C');
+
+  // Compute MAs
+  const ma5 = computeMA(closes, 5);
+  const ma10 = computeMA(closes, 10);
+  const ma20 = computeMA(closes, 20);
+  const ma60 = computeMA(closes, 60);
+
+  // Event markers (merge user events + filter by active categories)
+  const mergedEvents = getMergedEvents(caseData);
+  const filteredEvents = mergedEvents.filter(e => activeCategories.has(e.category));
+  const eventMarkers = [];
+  const eventLines = [];
+  filteredEvents.forEach(evt => {
+    const idx = dates.indexOf(evt.date);
+    const catInfo = CATEGORY_COLORS[evt.category] || { color: '#FF9500', label: evt.category };
+
+    if (idx >= 0) {
+      eventMarkers.push({
+        coord: [idx, lows[idx] * 0.995],
+        value: evt.title,
+        symbol: 'pin',
+        symbolSize: 32,
+        itemStyle: { color: catInfo.color },
+        _eventData: evt
+      });
+    } else {
+      // Find nearest date
+      const nearestIdx = findNearestDate(dates, evt.date);
+      if (nearestIdx >= 0) {
+        eventMarkers.push({
+          coord: [nearestIdx, lows[nearestIdx] * 0.995],
+          value: evt.title,
+          symbol: 'pin',
+          symbolSize: 32,
+          itemStyle: { color: catInfo.color },
+          _eventData: evt
+        });
+      }
+    }
+
+    // Vertical line at event date
+    const lineIdx = idx >= 0 ? idx : findNearestDate(dates, evt.date);
+    if (lineIdx >= 0) {
+      eventLines.push({
+        xAxis: lineIdx,
+        lineStyle: { color: catInfo.color, type: 'dashed', width: 1, opacity: 0.4 },
+        label: {
+          formatter: evt.title.length > 8 ? evt.title.substring(0, 8) + '..' : evt.title,
+          position: 'insideStartTop',
+          fontSize: 9,
+          color: catInfo.color,
+          rotate: 90,
+          offset: [5, 0],
+          backgroundColor: 'rgba(27,27,31,0.8)',
+          padding: [2, 4]
+        }
+      });
+    }
+  });
+
+  // ===== Second stock overlay (if exists) =====
+  const secondSymbol = caseData.related_stocks.length > 1 ? caseData.related_stocks[1] : null;
+  let secondSeries = [];
+  let secondYAxis = [];
+  if (secondSymbol && allPriceData[secondSymbol]) {
+    const sp = allPriceData[secondSymbol];
+    // Align dates
+    const secondCloses = dates.map(d => {
+      const found = sp.data.find(r => r.date === d);
+      return found ? found.close : null;
+    });
+    secondSeries = [{
+      name: sp.meta.name,
+      type: 'line',
+      xAxisIndex: 0,
+      yAxisIndex: 2,
+      data: secondCloses,
+      smooth: true,
+      lineStyle: { width: 1.5, color: '#a78bfa', type: 'dashed' },
+      itemStyle: { color: '#a78bfa' },
+      symbol: 'none',
+      z: 1
+    }];
+    secondYAxis = [{
+      type: 'value',
+      position: 'right',
+      offset: 50,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { color: '#a78bfa', fontSize: 10, formatter: '{value}' }
+    }];
+  }
+
+  const option = {
+    animation: true,
+    backgroundColor: '#1B1B1F',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        crossStyle: { color: '#888' },
+        lineStyle: { color: '#888', type: 'dashed' }
+      },
+      backgroundColor: 'rgba(35,35,40,0.95)',
+      borderColor: '#333',
+      textStyle: { color: '#E8E8E8', fontSize: 12 },
+      formatter: function(params) {
+        if (!params || !params.length) return '';
+        const idx = params[0].dataIndex;
+        const d = priceData.data[idx];
+        if (!d) return '';
+        const isUp = d.close >= d.open;
+        const color = isUp ? '#F04848' : '#00B07C';
+        const sign = d.change >= 0 ? '+' : '';
+
+        let evtHtml = '';
+        const evtsOnDate = filteredEvents.filter(e => {
+          const eidx = dates.indexOf(e.date);
+          const nidx = findNearestDate(dates, e.date);
+          return eidx === idx || nidx === idx;
+        });
+        if (evtsOnDate.length > 0) {
+          evtHtml = '<hr style="border-color:#444;margin:6px 0">';
+          evtsOnDate.forEach(e => {
+            const catInfo = CATEGORY_COLORS[e.category] || { label: e.category, color: '#FF9500' };
+            evtHtml += `<div style="margin:4px 0"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${catInfo.color};margin-right:4px;"></span><b>${e.title}</b></div>`;
+            evtHtml += `<div style="font-size:11px;color:#999;margin-left:10px;">${e.description.substring(0, 80)}...</div>`;
+          });
+        }
+
+        let secondHtml = '';
+        if (secondSymbol && allPriceData[secondSymbol]) {
+          const sp = allPriceData[secondSymbol];
+          const sr = sp.data.find(r => r.date === d.date);
+          if (sr) {
+            secondHtml = `<div style="margin-top:4px;color:#a78bfa">${sp.meta.name}: ${sr.close.toFixed(2)}</div>`;
+          }
+        }
+
+        return `
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${d.date}</div>
+          <div>開 <span style="color:${color}">${d.open.toFixed(2)}</span> &nbsp;
+               高 <span style="color:${color}">${d.high.toFixed(2)}</span> &nbsp;
+               低 <span style="color:${color}">${d.low.toFixed(2)}</span> &nbsp;
+               收 <span style="color:${color}">${d.close.toFixed(2)}</span></div>
+          <div>漲跌 <span style="color:${color}">${sign}${d.change.toFixed(2)} (${sign}${d.change_pct}%)</span> &nbsp;
+               量 ${formatVolume(d.volume)}</div>
+          ${secondHtml}
+          ${evtHtml}
+        `;
+      }
+    },
+    axisPointer: {
+      link: [{ xAxisIndex: 'all' }],
+      label: { backgroundColor: '#333' }
+    },
+    grid: [
+      { left: 60, right: secondSymbol ? 120 : 60, top: 30, height: '55%' },
+      { left: 60, right: secondSymbol ? 120 : 60, top: '72%', height: '18%' }
+    ],
+    xAxis: [
+      {
+        type: 'category',
+        data: dates,
+        gridIndex: 0,
+        axisLine: { lineStyle: { color: '#2A2A2E' } },
+        axisTick: { show: false },
+        axisLabel: { color: '#888', fontSize: 10, rotate: 0 },
+        splitLine: { show: false },
+        boundaryGap: true,
+        axisPointer: { label: { formatter: p => p.value } }
+      },
+      {
+        type: 'category',
+        data: dates,
+        gridIndex: 1,
+        axisLine: { lineStyle: { color: '#2A2A2E' } },
+        axisTick: { show: false },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        boundaryGap: true
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        gridIndex: 0,
+        position: 'right',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#2A2A2E' } },
+        axisLabel: { color: '#888', fontSize: 10 }
+      },
+      {
+        type: 'value',
+        gridIndex: 1,
+        position: 'right',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#2A2A2E' } },
+        axisLabel: { color: '#888', fontSize: 10, formatter: v => formatVolume(v) },
+        max: function(value) { return value.max * 2.5; }
+      },
+      ...(secondYAxis.length ? [{ ...secondYAxis[0], gridIndex: 0 }] : [])
+    ],
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: [0, 1],
+        start: 0,
+        end: 100,
+        minValueSpan: 10,
+        zoomOnMouseWheel: true,
+        moveOnMouseMove: false
+      },
+      {
+        type: 'slider',
+        xAxisIndex: [0, 1],
+        start: 0,
+        end: 100,
+        height: 20,
+        bottom: 8,
+        borderColor: '#2A2A2E',
+        backgroundColor: '#1B1B1F',
+        fillerColor: 'rgba(59,130,246,0.15)',
+        handleStyle: { color: '#3B82F6' },
+        textStyle: { color: '#888', fontSize: 10 },
+        dataBackground: {
+          lineStyle: { color: '#444' },
+          areaStyle: { color: 'rgba(59,130,246,0.05)' }
+        }
+      }
+    ],
+    series: [
+      {
+        name: 'K Line',
+        type: 'candlestick',
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        data: klineData,
+        itemStyle: {
+          color: '#F04848',       // up fill
+          color0: '#00B07C',      // down fill
+          borderColor: '#F04848', // up border
+          borderColor0: '#00B07C' // down border
+        },
+        markPoint: {
+          data: eventMarkers,
+          label: { show: false },
+          tooltip: {
+            formatter: function(params) {
+              const evt = params.data._eventData;
+              if (!evt) return '';
+              const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+              return `<div style="max-width:300px">
+                <div style="font-weight:600;margin-bottom:4px;">${evt.title}</div>
+                <div style="font-size:11px;color:#999">${evt.date} · <span style="color:${catInfo.color}">${catInfo.label}</span></div>
+                <div style="margin-top:4px;font-size:12px">${evt.description}</div>
+                <div style="margin-top:6px;font-size:11px;color:var(--accent)">Click pin for details →</div>
+              </div>`;
+            }
+          }
+        },
+        markLine: {
+          silent: true,
+          data: eventLines,
+          symbol: 'none',
+          animation: false
+        },
+        z: 10
+      },
+      // MA lines
+      { name: 'MA5', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma5, smooth: true, lineStyle: { width: 1, color: '#C0A254' }, itemStyle: { color: '#C0A254' }, symbol: 'none', z: 2 },
+      { name: 'MA10', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma10, smooth: true, lineStyle: { width: 1, color: '#E091EB' }, itemStyle: { color: '#E091EB' }, symbol: 'none', z: 2 },
+      { name: 'MA20', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma20, smooth: true, lineStyle: { width: 1, color: '#6FBAFF' }, itemStyle: { color: '#6FBAFF' }, symbol: 'none', z: 2 },
+      { name: 'MA60', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma60, smooth: true, lineStyle: { width: 1, color: '#44CE7A' }, itemStyle: { color: '#44CE7A' }, symbol: 'none', z: 2 },
+      // Volume
+      {
+        name: 'Volume',
+        type: 'bar',
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: volumes.map((v, i) => ({
+          value: v,
+          itemStyle: { color: priceData.data[i].close >= priceData.data[i].open ? 'rgba(240,72,72,0.7)' : 'rgba(0,176,124,0.7)' }
+        })),
+        barWidth: '60%'
+      },
+      // Second stock overlay
+      ...secondSeries
+    ]
+  };
+
+  chart.setOption(option, true);
+
+  // Click handler for event markers
+  chart.off('click');
+  chart.on('click', function(params) {
+    if (params.componentType === 'markPoint' && params.data._eventData) {
+      openEventPanel(params.data._eventData);
+    }
+  });
+
+  // Build event list
+  buildEventList(caseData);
+}
+
+// ===== Helpers =====
+function computeMA(data, window) {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i < window - 1) { result.push(null); continue; }
+    let sum = 0;
+    for (let j = 0; j < window; j++) sum += data[i - j];
+    result.push(+(sum / window).toFixed(2));
+  }
+  return result;
+}
+
+function findNearestDate(dates, target) {
+  let minDiff = Infinity, bestIdx = -1;
+  const t = new Date(target).getTime();
+  for (let i = 0; i < dates.length; i++) {
+    const diff = Math.abs(new Date(dates[i]).getTime() - t);
+    if (diff < minDiff) { minDiff = diff; bestIdx = i; }
+  }
+  return bestIdx;
+}
+
+function formatVolume(v) {
+  if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+  return '' + v;
+}
+
+// ===== Event Panel =====
+function openEventPanel(evt) {
+  const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+  const impactCls = evt.expected_impact === 'negative' ? 'impact-negative' :
+                    evt.expected_impact === 'positive' ? 'impact-positive' : 'impact-neutral';
+  const impactLabel = evt.expected_impact === 'negative' ? '利空' :
+                      evt.expected_impact === 'positive' ? '利好' : '中性';
+
+  let metaHtml = '';
+  if (evt.metadata) {
+    const entries = Object.entries(evt.metadata).filter(([k]) => !k.startsWith('_'));
+    if (entries.length) {
+      metaHtml = entries.map(([k, v]) => {
+        const display = typeof v === 'number' && v > 1e6 ? formatMoney(v) : v;
+        return `<div><span style="color:#888">${k}:</span> ${display}</div>`;
+      }).join('');
+    }
+  }
+
+  document.getElementById('panelTitle').textContent = evt.title;
+  document.getElementById('panelContent').innerHTML = `
+    <div class="field">
+      <div class="field-label">日期</div>
+      <div class="field-value">${evt.date}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">分類</div>
+      <div class="field-value"><span style="color:${catInfo.color}">${catInfo.label}</span></div>
+    </div>
+    <div class="field">
+      <div class="field-label">預期影響</div>
+      <div class="field-value"><span class="event-impact ${impactCls}">${impactLabel}</span> &nbsp; 信心度 ${(evt.confidence * 100).toFixed(0)}%</div>
+    </div>
+    <div class="field">
+      <div class="field-label">描述</div>
+      <div class="field-value">${evt.description}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">來源</div>
+      <div class="field-value">${evt.source_url ? `<a class="event-source-link" href="${evt.source_url}" target="_blank">${evt.source_url}</a>` : '<span style="color:#888">私人消息</span>'}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">標籤</div>
+      <div class="field-value">${(evt.tags || []).map(t => `<span class="event-tag">${t}</span>`).join('')}</div>
+    </div>
+    ${metaHtml ? `<div class="field"><div class="field-label">擴展資訊</div><div class="field-value" style="font-size:12px;">${metaHtml}</div></div>` : ''}
+    ${buildAnalysisHtml(evt)}
+  `;
+
+  document.getElementById('eventPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function buildAnalysisHtml(evt) {
+  const { llm, price_impact } = getEventAnalysis(evt.event_id);
+  if (!llm && !price_impact) return '';
+
+  let html = '<hr style="border-color:#333;margin:12px 0"><div class="field"><div class="field-label" style="color:#9333ea">AI 分析結果</div>';
+
+  if (llm && !llm.error) {
+    const levelColors = { high: '#F04848', medium: '#FFD93D', low: '#00B07C', negligible: '#888' };
+    const levelLabels = { high: '高影響', medium: '中影響', low: '低影響', negligible: '可忽略' };
+    const color = levelColors[llm.impact_level] || '#888';
+    html += `<div style="margin:6px 0;">
+      <span style="display:inline-block;padding:2px 10px;border-radius:3px;background:${color}22;color:${color};font-weight:600;font-size:13px;">${levelLabels[llm.impact_level] || llm.impact_level} (${llm.impact_score}/100)</span>
+    </div>`;
+    if (llm.reasoning) html += `<div style="font-size:12px;margin:4px 0;">${llm.reasoning}</div>`;
+    if (llm.category_refined) html += `<div style="font-size:11px;color:#888;margin:2px 0;">分類：${llm.category_refined}</div>`;
+    if (llm.expected_duration_days) html += `<div style="font-size:11px;color:#888;">預估影響持續：${llm.expected_duration_days} 天</div>`;
+    if (llm.comparable_events) html += `<div style="font-size:11px;color:#888;margin-top:4px;">歷史類比：${llm.comparable_events}</div>`;
+  }
+
+  if (price_impact) {
+    html += '<div style="margin-top:8px;font-size:12px;"><b>股價反應</b></div>';
+    html += '<table style="width:100%;font-size:11px;margin-top:4px;border-collapse:collapse;">';
+    html += '<tr style="color:#888"><td>窗口</td><td>變動</td></tr>';
+    const windows = ['1d_after', '3d_after', '5d_after', '10d_after', '20d_after'];
+    for (const w of windows) {
+      const d = price_impact.windows[w];
+      if (d) {
+        const color = d.change_pct >= 0 ? '#F04848' : '#00B07C';
+        const sign = d.change_pct >= 0 ? '+' : '';
+        html += `<tr><td style="padding:1px 4px;">${w.replace('_after','天後')}</td><td style="color:${color};padding:1px 4px;">${sign}${d.change_pct}%</td></tr>`;
+      }
+    }
+    html += '</table>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function closePanel() {
+  document.getElementById('eventPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function formatMoney(v) {
+  if (v >= 1e12) return (v / 1e12).toFixed(1) + ' 兆';
+  if (v >= 1e8) return (v / 1e8).toFixed(1) + ' 億';
+  if (v >= 1e4) return (v / 1e4).toFixed(0) + ' 萬';
+  return '' + v;
+}
+
+// Keyboard shortcut: Escape to close panel/modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closePanel(); closeAddForm(); }
+});
+
+// ===== User Events (localStorage) =====
+const LS_KEY = 'signal_dashboard_user_events';
+
+function getUserEvents() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveUserEvents(events) {
+  localStorage.setItem(LS_KEY, JSON.stringify(events));
+}
+
+function openAddForm() {
+  // Populate stock dropdown from loaded price data
+  const sel = document.getElementById('fmStock');
+  sel.innerHTML = '<option value="">— 請選擇 —</option>';
+  Object.values(allPriceData).forEach(pd => {
+    const opt = document.createElement('option');
+    opt.value = pd.meta.symbol;
+    opt.textContent = `${pd.meta.name} (${pd.meta.symbol})`;
+    sel.appendChild(opt);
+  });
+  // Default date to today
+  document.getElementById('fmDateReceived').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('fmDateEvent').value = '';
+  document.getElementById('fmDateEvent').disabled = false;
+  document.getElementById('fmDateUnknown').checked = false;
+  document.getElementById('fmTitle').value = '';
+  document.getElementById('fmDesc').value = '';
+  document.getElementById('fmConfidence').value = 50;
+  document.getElementById('fmConfVal').textContent = '50%';
+  document.getElementById('fmImpact').value = 'negative';
+  document.getElementById('fmSourceLevel').value = '';
+  document.getElementById('addModal').classList.add('open');
+}
+
+function closeAddForm() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function submitEvent() {
+  const stock = document.getElementById('fmStock').value;
+  const title = document.getElementById('fmTitle').value.trim();
+  const desc = document.getElementById('fmDesc').value.trim();
+  const dateReceived = document.getElementById('fmDateReceived').value;
+  const dateEvent = document.getElementById('fmDateUnknown').checked ? null : document.getElementById('fmDateEvent').value;
+  const impact = document.getElementById('fmImpact').value;
+  const confidence = parseInt(document.getElementById('fmConfidence').value) / 100;
+  const sourceLevel = document.getElementById('fmSourceLevel').value;
+
+  // Validation
+  if (!stock) return alert('請選擇關聯股票');
+  if (!title) return alert('請輸入事件標題');
+  if (!desc) return alert('請輸入事件描述');
+  if (!dateReceived) return alert('請選擇消息取得日期');
+
+  const evt = {
+    event_id: 'user_' + Date.now(),
+    date: dateEvent || dateReceived,
+    date_received: dateReceived,
+    date_event_estimated: dateEvent || null,
+    title: title,
+    description: desc,
+    category: 'insider_private',
+    source_type: 'private',
+    source_url: '',
+    related_stocks: [stock],
+    expected_impact: impact,
+    confidence: confidence,
+    tags: ['user_input'],
+    metadata: {
+      source_level: sourceLevel || null,
+      input_method: 'manual_form',
+      created_at: new Date().toISOString()
+    }
+  };
+
+  const events = getUserEvents();
+  events.push(evt);
+  saveUserEvents(events);
+
+  closeAddForm();
+  // Re-render current case to show new event
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+}
+
+function exportUserEvents() {
+  const events = getUserEvents();
+  if (!events.length) return alert('目前沒有用戶輸入的消息');
+
+  const output = {
+    exported_at: new Date().toISOString(),
+    count: events.length,
+    events: events
+  };
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `user_events_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updateUserEventCount() {
+  const count = getUserEvents().length;
+  let el = document.getElementById('userEventCount');
+  if (!el) {
+    el = document.createElement('span');
+    el.id = 'userEventCount';
+    el.style.cssText = 'font-size:11px;color:var(--text-secondary);margin-left:8px;';
+    document.querySelector('.header > div:last-child').insertBefore(el, document.querySelector('.header > div:last-child > span:last-child'));
+  }
+  el.textContent = count > 0 ? `${count} 則私人消息` : '';
+}
+
+// Merge user events + imported events into case events for rendering
+function getMergedEvents(caseData) {
+  const userEvents = getUserEvents();
+  const caseStocks = new Set(caseData.related_stocks);
+  const relevantUserEvents = userEvents.filter(e =>
+    e.related_stocks.some(s => caseStocks.has(s))
+  );
+  const relevantImported = importedEvents.filter(e =>
+    (e.related_stocks || []).some(s => caseStocks.has(s))
+  );
+  return [...caseData.events, ...relevantUserEvents, ...relevantImported];
+}
+
+// ===== Import External Events =====
+let importedEvents = [];
+
+function importEvents(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Support both formats: {events: [...]} or [...] or {cases: [{events: [...]}]}
+      let events = [];
+      if (Array.isArray(data)) events = data;
+      else if (data.events) events = data.events;
+      else if (data.cases) data.cases.forEach(c => events.push(...(c.events || [])));
+
+      importedEvents = events;
+      alert(`已載入 ${events.length} 則外部事件`);
+      selectCase(currentCaseIdx);
+    } catch (err) {
+      alert('JSON 解析失敗: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ===== Import Analysis Results =====
+let analysisData = { price_impacts: [], llm_assessments: [], private_public_matches: [] };
+
+function importAnalysis(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      analysisData = JSON.parse(e.target.result);
+      const llmCount = (analysisData.llm_assessments || []).length;
+      const piCount = (analysisData.price_impacts || []).length;
+      const matchCount = (analysisData.private_public_matches || []).length;
+      alert(`已載入分析結果：${piCount} 筆股價影響 / ${llmCount} 筆 LLM 評估 / ${matchCount} 筆私人→公開匹配`);
+      selectCase(currentCaseIdx);
+    } catch (err) {
+      alert('JSON 解析失敗: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function getEventAnalysis(eventId) {
+  const llm = (analysisData.llm_assessments || []).find(a => a.event_id === eventId);
+  const pi = (analysisData.price_impacts || []).find(p => p.event === eventId);
+  return { llm, price_impact: pi ? pi.impact : null };
+}
+
+// ===== Category Filter =====
+function toggleCategory(cat, checked) {
+  if (checked) activeCategories.add(cat);
+  else activeCategories.delete(cat);
+  document.querySelector(`.legend-item[data-cat="${cat}"]`).classList.toggle('off', !checked);
+  selectCase(currentCaseIdx);
+}
+
+// ===== Event List Panel =====
+function toggleEventList() {
+  const panel = document.getElementById('eventListPanel');
+  const btn = document.getElementById('evtListBtn');
+  panel.classList.toggle('open');
+  btn.textContent = panel.classList.contains('open') ? '隱藏事件列表' : '顯示事件列表';
+}
+
+function buildEventList(caseData) {
+  const merged = getMergedEvents(caseData);
+  const tbody = document.getElementById('eventListBody');
+  if (!merged.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:12px;">無事件</td></tr>';
+    return;
+  }
+  const sorted = [...merged].sort((a, b) => a.date > b.date ? -1 : 1);
+  tbody.innerHTML = sorted.map(evt => {
+    const catInfo = CATEGORY_COLORS[evt.category] || { label: evt.category, color: '#FF9500' };
+    const impactLabel = evt.expected_impact === 'negative' ? '利空' : evt.expected_impact === 'positive' ? '利好' : '中性';
+    const impactColor = evt.expected_impact === 'negative' ? 'var(--up-color)' : evt.expected_impact === 'positive' ? 'var(--down-color)' : 'var(--text-secondary)';
+    const isUser = evt.event_id.startsWith('user_');
+    const actions = isUser
+      ? `<button class="btn-xs" onclick="editEvent('${evt.event_id}')">編輯</button> <button class="btn-xs btn-danger" onclick="deleteEvent('${evt.event_id}')">刪除</button>`
+      : '<span style="color:var(--text-secondary)">Demo</span>';
+    return `<tr>
+      <td style="white-space:nowrap">${evt.date}</td>
+      <td><span class="evt-cat-dot" style="background:${catInfo.color}"></span>${catInfo.label}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${evt.title}">${evt.title}</td>
+      <td style="color:${impactColor}">${impactLabel}</td>
+      <td>${Math.round((evt.confidence || 0) * 100)}%</td>
+      <td>${isUser ? '私人' : (evt.source_type || '')}</td>
+      <td style="white-space:nowrap">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== Edit / Delete =====
+let editingEventId = null;
+
+function editEvent(eventId) {
+  const events = getUserEvents();
+  const evt = events.find(e => e.event_id === eventId);
+  if (!evt) return;
+
+  editingEventId = eventId;
+  openAddForm();
+
+  // Pre-fill form
+  document.getElementById('fmStock').value = evt.related_stocks[0] || '';
+  document.getElementById('fmTitle').value = evt.title;
+  document.getElementById('fmDesc').value = evt.description;
+  document.getElementById('fmDateReceived').value = evt.date_received || evt.date;
+  document.getElementById('fmDateEvent').value = evt.date_event_estimated || '';
+  document.getElementById('fmDateUnknown').checked = !evt.date_event_estimated;
+  document.getElementById('fmDateEvent').disabled = !evt.date_event_estimated;
+  document.getElementById('fmImpact').value = evt.expected_impact;
+  document.getElementById('fmSourceLevel').value = (evt.metadata && evt.metadata.source_level) || '';
+  document.getElementById('fmConfidence').value = Math.round(evt.confidence * 100);
+  document.getElementById('fmConfVal').textContent = Math.round(evt.confidence * 100) + '%';
+
+  // Change modal title
+  document.querySelector('#addModal .modal-header h3').textContent = '編輯私人消息';
+}
+
+function deleteEvent(eventId) {
+  if (!confirm('確定刪除這則消息？')) return;
+  let events = getUserEvents();
+  const deleted = events.find(e => e.event_id === eventId);
+  events = events.filter(e => e.event_id !== eventId);
+  saveUserEvents(events);
+  addEditLog('delete', eventId, deleted ? { title: deleted.title } : {});
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+}
+
+// ===== Edit LOG =====
+const LOG_KEY = 'signal_dashboard_edit_log';
+
+function getEditLog() {
+  try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function addEditLog(action, eventId, changes) {
+  const log = getEditLog();
+  log.push({
+    action: action,
+    event_id: eventId,
+    timestamp: new Date().toISOString(),
+    changes: changes
+  });
+  localStorage.setItem(LOG_KEY, JSON.stringify(log));
+}
+
+// Override submitEvent to support edit mode + logging
+const _origSubmit = submitEvent;
+submitEvent = function() {
+  const stock = document.getElementById('fmStock').value;
+  const title = document.getElementById('fmTitle').value.trim();
+  const desc = document.getElementById('fmDesc').value.trim();
+  const dateReceived = document.getElementById('fmDateReceived').value;
+  const dateEvent = document.getElementById('fmDateUnknown').checked ? null : document.getElementById('fmDateEvent').value;
+  const impact = document.getElementById('fmImpact').value;
+  const confidence = parseInt(document.getElementById('fmConfidence').value) / 100;
+  const sourceLevel = document.getElementById('fmSourceLevel').value;
+
+  if (!stock) return alert('請選擇關聯股票');
+  if (!title) return alert('請輸入事件標題');
+  if (!desc) return alert('請輸入事件描述');
+  if (!dateReceived) return alert('請選擇消息取得日期');
+
+  const events = getUserEvents();
+
+  if (editingEventId) {
+    // Edit mode
+    const idx = events.findIndex(e => e.event_id === editingEventId);
+    if (idx === -1) return alert('找不到該事件');
+    const old = { ...events[idx] };
+    events[idx] = {
+      ...events[idx],
+      date: dateEvent || dateReceived,
+      date_received: dateReceived,
+      date_event_estimated: dateEvent || null,
+      title, description: desc,
+      related_stocks: [stock],
+      expected_impact: impact,
+      confidence,
+      metadata: { ...events[idx].metadata, source_level: sourceLevel || null, last_edited: new Date().toISOString() }
+    };
+    saveUserEvents(events);
+    addEditLog('edit', editingEventId, { old_title: old.title, new_title: title });
+    editingEventId = null;
+  } else {
+    // Create mode
+    const evt = {
+      event_id: 'user_' + Date.now(),
+      date: dateEvent || dateReceived,
+      date_received: dateReceived,
+      date_event_estimated: dateEvent || null,
+      title, description: desc,
+      category: 'insider_private',
+      source_type: 'private', source_url: '',
+      related_stocks: [stock],
+      expected_impact: impact,
+      confidence,
+      tags: ['user_input'],
+      metadata: { source_level: sourceLevel || null, input_method: 'manual_form', created_at: new Date().toISOString() }
+    };
+    events.push(evt);
+    saveUserEvents(events);
+    addEditLog('create', evt.event_id, { title });
+  }
+
+  closeAddForm();
+  document.querySelector('#addModal .modal-header h3').textContent = '新增私人消息';
+  selectCase(currentCaseIdx);
+  updateUserEventCount();
+};
+
+// Override exportUserEvents to include edit log
+const _origExport = exportUserEvents;
+exportUserEvents = function() {
+  const events = getUserEvents();
+  const log = getEditLog();
+  if (!events.length && !log.length) return alert('目前沒有用戶輸入的消息');
+  const output = {
+    exported_at: new Date().toISOString(),
+    count: events.length,
+    events,
+    edit_log: log
+  };
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `user_events_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// ===== Go =====
+init().catch(err => {
+  document.getElementById('chart-container').innerHTML =
+    `<div style="padding:40px;text-align:center;color:var(--up-color);">
+      載入失敗: ${err.message}<br><br>
+      <span style="color:var(--text-secondary);font-size:13px;">
+        請確認 data/ 目錄下有 events.json 及 price_*.json 檔案。<br>
+        如使用 file:// 協議開啟，部分瀏覽器會阻擋 fetch 請求，請用 HTTP server：<br>
+        <code>python -m http.server 8000</code>
+      </span>
+    </div>`;
+});
+</script>
+</body>
+</html>
