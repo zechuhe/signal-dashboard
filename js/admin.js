@@ -87,12 +87,22 @@ function clearLog() {
   renderAdminTab('log');
 }
 
-function renderAdminConfig(body) {
-  const sources = [
-    { name: 'HKEX News', desc: '港交所公告', key: 'hkex', status: true },
-    { name: 'Google News', desc: '財經新聞 RSS', key: 'google_news', status: true },
-    { name: 'Eastmoney', desc: '東方財富', key: 'eastmoney', status: true }
-  ];
+async function renderAdminConfig(body) {
+  // Load sources from config file instead of hardcoding
+  let sources = [];
+  try {
+    const resp = await fetch('config/sources.json');
+    const cfg = await resp.json();
+    sources = Object.entries(cfg.sources || {}).map(function(entry) {
+      return { name: entry[1].name, desc: entry[0], key: entry[0], status: entry[1].enabled !== false };
+    });
+  } catch (e) {
+    sources = [
+      { name: 'HKEX News', desc: 'hkex', key: 'hkex', status: true },
+      { name: 'Google News', desc: 'google_news', key: 'google_news', status: true },
+      { name: 'Eastmoney', desc: 'eastmoney', key: 'eastmoney', status: true }
+    ];
+  }
 
   body.innerHTML = `
     <div class="admin-section"><h4>數據來源狀態</h4></div>

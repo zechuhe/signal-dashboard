@@ -1,58 +1,66 @@
 // ===== State =====
 let chart = null;
-let openStocks = [];      // [{symbol, name, exchange, priceData, events}]
+let openStocks = [];
 let activeTabIdx = -1;
-let activeCategories = new Set(Object.keys(CATEGORIES));
+let activeCategories = new Set();
 let editingId = null;
-let stockList = [];        // [{code, name, exchange, yahooSuffix}]
+let stockList = [];
 
 // ===== Init =====
 async function init() {
-  // Register overlay
+  // 1. Load config first
+  await loadAppConfig();
+  activeCategories = new Set(Object.keys(CATEGORIES));
+
+  // 2. Register overlay
   registerSignalOverlay();
 
-  // Init chart
-  chart = klinecharts.init('chart-area', { styles: 'dark' });
+  // 3. Init chart with config
+  var chartCfg = getChartConfig();
+  chart = klinecharts.init('chart-area', { styles: chartCfg.theme || 'dark' });
 
-  // Custom styles
+  var candle = chartCfg.candle || {};
+  var cross = chartCfg.crosshair || {};
   chart.setStyles({
     candle: {
       bar: {
-        upColor: '#F04848', downColor: '#00B07C', noChangeColor: '#76808F',
-        upBorderColor: '#F04848', downBorderColor: '#00B07C',
-        upWickColor: '#F04848', downWickColor: '#00B07C'
+        upColor: candle.upColor || '#F04848',
+        downColor: candle.downColor || '#00B07C',
+        noChangeColor: candle.noChangeColor || '#76808F',
+        upBorderColor: candle.upColor || '#F04848',
+        downBorderColor: candle.downColor || '#00B07C',
+        upWickColor: candle.upColor || '#F04848',
+        downWickColor: candle.downColor || '#00B07C'
       },
       tooltip: { showRule: 'always', showType: 'standard' }
     },
-    indicator: {
-      tooltip: { showRule: 'always' }
-    },
+    indicator: { tooltip: { showRule: 'always' } },
     crosshair: {
-      horizontal: { line: { color: '#555', style: 'dash' }, text: { backgroundColor: '#373a40' } },
-      vertical: { line: { color: '#555', style: 'dash' }, text: { backgroundColor: '#373a40' } }
+      horizontal: { line: { color: cross.lineColor || '#555', style: 'dash' }, text: { backgroundColor: cross.textBg || '#373a40' } },
+      vertical: { line: { color: cross.lineColor || '#555', style: 'dash' }, text: { backgroundColor: cross.textBg || '#373a40' } }
     }
   });
 
-  // Add MA + Volume
+  // 4. Add indicators from config
+  var indicators = chartCfg.indicators || {};
+  var maCfg = indicators.MA || { periods: [5, 10, 20, 60] };
+  var volCfg = indicators.VOL || { height: 80 };
+
   chart.createIndicator('MA', false, { id: 'candle_pane' });
-  chart.overrideIndicator({ name: 'MA', calcParams: [5, 10, 20, 60] }, 'candle_pane');
-  chart.createIndicator('VOL', false, { height: 80 });
+  chart.overrideIndicator({ name: 'MA', calcParams: maCfg.periods }, 'candle_pane');
+  chart.createIndicator('VOL', false, { height: volCfg.height });
 
-  // Build filter bar
+  // 5. Build UI
   buildFilterBar();
-
-  // Setup search
   setupSearch();
-
-  // Load stock list
   await loadStockList();
 }
 
 // ===== Keyboard =====
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeSidePanel(); closeAddForm(); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('searchInput').focus(); }
 });
 
 // ===== Go =====
-init().catch(err => console.error('Init failed:', err));
+init().catch(function(err) { console.error('Init failed:', err); });

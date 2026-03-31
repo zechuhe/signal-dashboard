@@ -1,0 +1,86 @@
+{
+  "_comment": "Signal Dashboard UI 配置。修改此檔不需改代碼。",
+
+  "app": {
+    "name": "Signal Dashboard",
+    "version": "2.0",
+    "locale": "zh-Hant",
+    "port": 8443
+  },
+
+  "categories": {
+    "insider_private": { "label": "私人消息", "color": "#FF6B6B", "marker": "▲▼" },
+    "public_corporate": { "label": "企業公告", "color": "#4ECDC4", "marker": "▲▼" },
+    "public_macro": { "label": "宏觀事件", "color": "#FFD93D", "marker": "▲▼" },
+    "public_policy": { "label": "政策法規", "color": "#6C5CE7", "marker": "▲▼" },
+    "public_legal": { "label": "法律訴訟", "color": "#FF9500", "marker": "▲▼" }
+  },
+
+  "impact": {
+    "positive": { "label": "利好", "color": "#F04848", "marker": "▲", "markerOffset": 18 },
+    "negative": { "label": "利空", "color": "#00B07C", "marker": "▼", "markerOffset": -18 },
+    "neutral":  { "label": "中性", "color": "#888888", "marker": "◆", "markerOffset": 0 }
+  },
+
+  "chart": {
+    "theme": "dark",
+    "candle": {
+      "upColor": "#F04848",
+      "downColor": "#00B07C",
+      "noChangeColor": "#76808F"
+    },
+    "crosshair": {
+      "lineColor": "#555",
+      "textBg": "#373a40"
+    },
+    "indicators": {
+      "MA": { "periods": [5, 10, 20, 60] },
+      "VOL": { "height": 80 }
+    },
+    "marker": {
+      "fontSize": 14,
+      "fontFamily": "Arial",
+      "priceOffsetRatio": { "positive": 0.99, "negative": 1.01 }
+    }
+  },
+
+  "timeRanges": [
+    { "label": "3M", "tradingDays": 63 },
+    { "label": "6M", "tradingDays": 126 },
+    { "label": "1Y", "tradingDays": 252 },
+    { "label": "3Y", "tradingDays": 756 },
+    { "label": "全部", "tradingDays": -1 }
+  ],
+
+  "search": {
+    "maxResults": 15,
+    "stockListUrl": "data/stock_list.json",
+    "fallbackStocks": [
+      { "code": "0700", "name": "Tencent 騰訊", "exchange": "HKEX" },
+      { "code": "0001", "name": "CK Hutchison 長和", "exchange": "HKEX" },
+      { "code": "AAPL", "name": "Apple", "exchange": "NASDAQ" },
+      { "code": "2330", "name": "TSMC 台積電", "exchange": "TWSE" },
+      { "code": "600519", "name": "Kweichow Moutai 貴州茅台", "exchange": "SSE" }
+    ]
+  },
+
+  "storage": {
+    "eventsKey": "sd_user_events",
+    "logKey": "sd_edit_log",
+    "configKey": "sd_app_config"
+  },
+
+  "exchanges": {
+    "HKEX":    { "label": "港股", "yahooSuffix": ".HK", "currency": "HKD" },
+    "NYSE":    { "label": "美股", "yahooSuffix": "",    "currency": "USD" },
+    "NASDAQ":  { "label": "美股", "yahooSuffix": "",    "currency": "USD" },
+    "TWSE":    { "label": "台股", "yahooSuffix": ".TW", "currency": "TWD" },
+    "TPEx":    { "label": "台股", "yahooSuffix": ".TWO","currency": "TWD" },
+    "SSE":     { "label": "A股",  "yahooSuffix": ".SS", "currency": "CNY" },
+    "SZSE":    { "label": "A股",  "yahooSuffix": ".SZ", "currency": "CNY" }
+  },
+
+  "cdn": {
+    "klinecharts": "https://cdn.jsdelivr.net/npm/klinecharts@9.8.12/dist/umd/klinecharts.min.js"
+  }
+}

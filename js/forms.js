@@ -8,6 +8,12 @@ function openAddForm() {
     sel.innerHTML += `<option value="${s.symbol}">${s.name} (${s.symbol})</option>`;
   });
   if (activeTabIdx >= 0) sel.value = openStocks[activeTabIdx].symbol;
+  // Populate category selector from config
+  var catSel = document.getElementById('fmCategory');
+  catSel.innerHTML = Object.entries(CATEGORIES).map(function(entry) {
+    return '<option value="' + entry[0] + '">' + entry[1].label + '</option>';
+  }).join('');
+  catSel.value = 'insider_private';
   document.getElementById('fmTitle').value = '';
   document.getElementById('fmDesc').value = '';
   document.getElementById('fmDateRcv').value = new Date().toISOString().slice(0,10);
@@ -46,7 +52,9 @@ function submitEvent() {
     addLog('edit', editingId, { title });
     editingId = null;
   } else {
-    const evt = { event_id: 'user_' + Date.now(), date: dateEvt || dateRcv, date_received: dateRcv, date_event_estimated: dateEvt, title, description: desc, category: 'insider_private', source_type: 'private', source_url: '', related_stocks: [stock], expected_impact: impact, confidence: conf, tags: ['user_input'], metadata: { source_level: srcLvl, created_at: new Date().toISOString() } };
+    const category = document.getElementById('fmCategory').value || 'insider_private';
+    const sourceType = category === 'insider_private' ? 'private' : 'manual';
+    const evt = { event_id: 'user_' + Date.now(), date: dateEvt || dateRcv, date_received: dateRcv, date_event_estimated: dateEvt, title, description: desc, category: category, source_type: sourceType, source_url: '', related_stocks: [stock], expected_impact: impact, confidence: conf, tags: ['user_input'], metadata: { source_level: srcLvl, created_at: new Date().toISOString() } };
     events.push(evt);
     addLog('create', evt.event_id, { title });
   }
@@ -61,8 +69,9 @@ function editEvent(id) {
   if (!evt) return;
   editingId = id;
   openAddForm();
-  document.getElementById('modalTitle').textContent = '編輯私人消息';
+  document.getElementById('modalTitle').textContent = '編輯事件';
   document.getElementById('fmStock').value = (evt.related_stocks||[])[0] || '';
+  document.getElementById('fmCategory').value = evt.category || 'insider_private';
   document.getElementById('fmTitle').value = evt.title;
   document.getElementById('fmDesc').value = evt.description;
   document.getElementById('fmDateRcv').value = evt.date_received || evt.date;

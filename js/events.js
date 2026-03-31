@@ -19,8 +19,9 @@ function buildEventList(stock) {
   const sorted = [...events].sort((a, b) => b.date.localeCompare(a.date));
   tbody.innerHTML = sorted.map(evt => {
     const cat = CATEGORIES[evt.category] || { label: evt.category, color: '#888' };
-    const impLabel = evt.expected_impact === 'negative' ? '利空' : evt.expected_impact === 'positive' ? '利好' : '中性';
-    const impColor = evt.expected_impact === 'negative' ? 'var(--up-color)' : evt.expected_impact === 'positive' ? 'var(--down-color)' : 'var(--text-secondary)';
+    const impStyle = getImpactStyle(evt.expected_impact);
+    const impLabel = impStyle.label;
+    const impColor = impStyle.color;
     const isUser = (evt.event_id || '').startsWith('user_');
     const actions = isUser
       ? `<button class="btn-xs" onclick="editEvent('${evt.event_id}')">編輯</button> <button class="btn-xs" onclick="deleteEvent('${evt.event_id}')">刪除</button>`
@@ -47,10 +48,9 @@ function filterEventList() {
 // ===== Side Panel =====
 function openSidePanel(evt) {
   const cat = CATEGORIES[evt.category] || { label: evt.category, color: '#888' };
-  const impCls = evt.expected_impact === 'negative' ? 'background:rgba(240,72,72,0.15);color:#F04848'
-    : evt.expected_impact === 'positive' ? 'background:rgba(0,176,124,0.15);color:#00B07C'
-    : 'background:rgba(136,136,136,0.15);color:#888';
-  const impLabel = evt.expected_impact === 'negative' ? '利空' : evt.expected_impact === 'positive' ? '利好' : '中性';
+  const impStyle = getImpactStyle(evt.expected_impact);
+  const impCls = 'background:' + impStyle.color + '22;color:' + impStyle.color;
+  const impLabel = impStyle.label;
 
   document.getElementById('spTitle').textContent = evt.title;
   document.getElementById('spBody').innerHTML = `
