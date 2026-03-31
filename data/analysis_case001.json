@@ -1,0 +1,573 @@
+{
+  "analysis_info": {
+    "events_count": 8,
+    "has_price_data": true,
+    "llm_enabled": true,
+    "analyzed_at": "2026-03-31T08:40:38.219032"
+  },
+  "price_impacts": [
+    {
+      "event": "evt_001",
+      "impact": {
+        "event_date": "2013-08-29",
+        "nearest_trading_date": "2013-08-29",
+        "base_price": 42.845,
+        "windows": {
+          "1d_before": {
+            "date": "2013-08-28",
+            "price": 42.334,
+            "change_pct": 1.21
+          },
+          "1d_after": {
+            "date": "2013-08-30",
+            "price": 43.5132,
+            "change_pct": 1.56
+          },
+          "3d_before": {
+            "date": "2013-08-26",
+            "price": 42.8057,
+            "change_pct": 0.09
+          },
+          "3d_after": {
+            "date": "2013-09-03",
+            "price": 44.7779,
+            "change_pct": 4.51
+          },
+          "5d_before": {
+            "date": "2013-08-22",
+            "price": 42.8843,
+            "change_pct": -0.09
+          },
+          "5d_after": {
+            "date": "2013-09-05",
+            "price": 44.7383,
+            "change_pct": 4.42
+          },
+          "10d_before": {
+            "date": "2013-08-15",
+            "price": 45.0069,
+            "change_pct": -4.8
+          },
+          "10d_after": {
+            "date": "2013-09-12",
+            "price": 45.4114,
+            "change_pct": 5.99
+          },
+          "20d_before": {
+            "date": "2013-08-01",
+            "price": 43.867,
+            "change_pct": -2.33
+          },
+          "20d_after": {
+            "date": "2013-09-27",
+            "price": 47.9056,
+            "change_pct": 11.81
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_002",
+      "impact": {
+        "event_date": "2013-10-18",
+        "nearest_trading_date": "2013-10-18",
+        "base_price": 49.0934,
+        "windows": {
+          "1d_before": {
+            "date": "2013-10-17",
+            "price": 48.7767,
+            "change_pct": 0.65
+          },
+          "1d_after": {
+            "date": "2013-10-21",
+            "price": 48.8162,
+            "change_pct": -0.56
+          },
+          "3d_before": {
+            "date": "2013-10-15",
+            "price": 48.3807,
+            "change_pct": 1.47
+          },
+          "3d_after": {
+            "date": "2013-10-23",
+            "price": 48.4599,
+            "change_pct": -1.29
+          },
+          "5d_before": {
+            "date": "2013-10-10",
+            "price": 48.4599,
+            "change_pct": 1.31
+          },
+          "5d_after": {
+            "date": "2013-10-25",
+            "price": 47.391,
+            "change_pct": -3.47
+          },
+          "10d_before": {
+            "date": "2013-10-03",
+            "price": 49.4893,
+            "change_pct": -0.8
+          },
+          "10d_after": {
+            "date": "2013-11-01",
+            "price": 48.4599,
+            "change_pct": -1.29
+          },
+          "20d_before": {
+            "date": "2013-09-17",
+            "price": 46.0844,
+            "change_pct": 6.53
+          },
+          "20d_after": {
+            "date": "2013-11-15",
+            "price": 47.9452,
+            "change_pct": -2.34
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_003",
+      "impact": {
+        "event_date": "2014-03-21",
+        "nearest_trading_date": "2014-03-21",
+        "base_price": 48.6183,
+        "windows": {
+          "1d_before": {
+            "date": "2014-03-20",
+            "price": 47.7473,
+            "change_pct": 1.82
+          },
+          "1d_after": {
+            "date": "2014-03-24",
+            "price": 48.7371,
+            "change_pct": 0.24
+          },
+          "3d_before": {
+            "date": "2014-03-18",
+            "price": 47.9452,
+            "change_pct": 1.4
+          },
+          "3d_after": {
+            "date": "2014-03-26",
+            "price": 50.2019,
+            "change_pct": 3.26
+          },
+          "5d_before": {
+            "date": "2014-03-14",
+            "price": 47.8265,
+            "change_pct": 1.66
+          },
+          "5d_after": {
+            "date": "2014-03-28",
+            "price": 50.4791,
+            "change_pct": 3.83
+          },
+          "10d_before": {
+            "date": "2014-03-07",
+            "price": 50.004,
+            "change_pct": -2.77
+          },
+          "10d_after": {
+            "date": "2014-04-04",
+            "price": 52.9338,
+            "change_pct": 8.88
+          },
+          "20d_before": {
+            "date": "2014-02-21",
+            "price": 46.8763,
+            "change_pct": 3.72
+          },
+          "20d_after": {
+            "date": "2014-04-22",
+            "price": 54.2403,
+            "change_pct": 11.56
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_004",
+      "impact": {
+        "event_date": "2015-01-09",
+        "nearest_trading_date": "2015-01-09",
+        "base_price": 55.3064,
+        "windows": {
+          "1d_before": {
+            "date": "2015-01-08",
+            "price": 55.661,
+            "change_pct": -0.64
+          },
+          "1d_after": {
+            "date": "2015-01-12",
+            "price": 63.4606,
+            "change_pct": 14.74
+          },
+          "3d_before": {
+            "date": "2015-01-06",
+            "price": 56.2814,
+            "change_pct": -1.73
+          },
+          "3d_after": {
+            "date": "2015-01-14",
+            "price": 63.1061,
+            "change_pct": 14.1
+          },
+          "5d_before": {
+            "date": "2015-01-02",
+            "price": 58.3642,
+            "change_pct": -5.24
+          },
+          "5d_after": {
+            "date": "2015-01-16",
+            "price": 62.5299,
+            "change_pct": 13.06
+          },
+          "10d_before": {
+            "date": "2014-12-23",
+            "price": 57.5666,
+            "change_pct": -3.93
+          },
+          "10d_after": {
+            "date": "2015-01-23",
+            "price": 64.6128,
+            "change_pct": 16.83
+          },
+          "20d_before": {
+            "date": "2014-12-09",
+            "price": 60.2698,
+            "change_pct": -8.24
+          },
+          "20d_after": {
+            "date": "2015-02-06",
+            "price": 66.5184,
+            "change_pct": 20.27
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_005",
+      "impact": {
+        "event_date": "2016-10-26",
+        "nearest_trading_date": "2016-10-26",
+        "base_price": 64.2076,
+        "windows": {
+          "1d_before": {
+            "date": "2016-10-25",
+            "price": 64.9995,
+            "change_pct": -1.22
+          },
+          "1d_after": {
+            "date": "2016-10-27",
+            "price": 63.5147,
+            "change_pct": -1.08
+          },
+          "3d_before": {
+            "date": "2016-10-21",
+            "price": 64.8015,
+            "change_pct": -0.92
+          },
+          "3d_after": {
+            "date": "2016-10-31",
+            "price": 63.3167,
+            "change_pct": -1.39
+          },
+          "5d_before": {
+            "date": "2016-10-19",
+            "price": 64.4385,
+            "change_pct": -0.36
+          },
+          "5d_after": {
+            "date": "2016-11-02",
+            "price": 63.2507,
+            "change_pct": -1.49
+          },
+          "10d_before": {
+            "date": "2016-10-12",
+            "price": 63.4157,
+            "change_pct": 1.25
+          },
+          "10d_after": {
+            "date": "2016-11-09",
+            "price": 62.0629,
+            "change_pct": -3.34
+          },
+          "20d_before": {
+            "date": "2016-09-27",
+            "price": 65.3294,
+            "change_pct": -1.72
+          },
+          "20d_after": {
+            "date": "2016-11-23",
+            "price": 63.4817,
+            "change_pct": -1.13
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_005b",
+      "impact": {
+        "event_date": "2017-09-15",
+        "nearest_trading_date": "2017-09-15",
+        "base_price": 68.2601,
+        "windows": {
+          "1d_before": {
+            "date": "2017-09-14",
+            "price": 68.1923,
+            "change_pct": 0.1
+          },
+          "1d_after": {
+            "date": "2017-09-18",
+            "price": 68.5312,
+            "change_pct": 0.4
+          },
+          "3d_before": {
+            "date": "2017-09-12",
+            "price": 68.0567,
+            "change_pct": 0.3
+          },
+          "3d_after": {
+            "date": "2017-09-20",
+            "price": 68.1923,
+            "change_pct": -0.1
+          },
+          "5d_before": {
+            "date": "2017-09-08",
+            "price": 67.5822,
+            "change_pct": 1.0
+          },
+          "5d_after": {
+            "date": "2017-09-22",
+            "price": 67.6161,
+            "change_pct": -0.94
+          },
+          "10d_before": {
+            "date": "2017-09-01",
+            "price": 68.4092,
+            "change_pct": -0.22
+          },
+          "10d_after": {
+            "date": "2017-09-29",
+            "price": 67.6839,
+            "change_pct": -0.84
+          },
+          "20d_before": {
+            "date": "2017-08-18",
+            "price": 67.8038,
+            "change_pct": 0.67
+          },
+          "20d_after": {
+            "date": "2017-10-17",
+            "price": 68.3279,
+            "change_pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_006",
+      "impact": {
+        "event_date": "2017-11-01",
+        "nearest_trading_date": "2017-11-01",
+        "base_price": 67.4128,
+        "windows": {
+          "1d_before": {
+            "date": "2017-10-31",
+            "price": 67.1416,
+            "change_pct": 0.4
+          },
+          "1d_after": {
+            "date": "2017-11-02",
+            "price": 67.2433,
+            "change_pct": -0.25
+          },
+          "3d_before": {
+            "date": "2017-10-27",
+            "price": 67.6161,
+            "change_pct": -0.3
+          },
+          "3d_after": {
+            "date": "2017-11-06",
+            "price": 66.5654,
+            "change_pct": -1.26
+          },
+          "5d_before": {
+            "date": "2017-10-25",
+            "price": 67.8534,
+            "change_pct": -0.65
+          },
+          "5d_after": {
+            "date": "2017-11-08",
+            "price": 66.9044,
+            "change_pct": -0.75
+          },
+          "10d_before": {
+            "date": "2017-10-18",
+            "price": 69.2091,
+            "change_pct": -2.6
+          },
+          "10d_after": {
+            "date": "2017-11-15",
+            "price": 66.4299,
+            "change_pct": -1.46
+          },
+          "20d_before": {
+            "date": "2017-10-03",
+            "price": 67.7178,
+            "change_pct": -0.45
+          },
+          "20d_after": {
+            "date": "2017-11-29",
+            "price": 65.9893,
+            "change_pct": -2.11
+          }
+        }
+      }
+    },
+    {
+      "event": "evt_007",
+      "impact": {
+        "event_date": "2018-03-16",
+        "nearest_trading_date": "2018-03-16",
+        "base_price": 67.0399,
+        "windows": {
+          "1d_before": {
+            "date": "2018-03-15",
+            "price": 66.8366,
+            "change_pct": 0.3
+          },
+          "1d_after": {
+            "date": "2018-03-19",
+            "price": 65.7859,
+            "change_pct": -1.87
+          },
+          "3d_before": {
+            "date": "2018-03-13",
+            "price": 66.7688,
+            "change_pct": 0.41
+          },
+          "3d_after": {
+            "date": "2018-03-21",
+            "price": 65.1758,
+            "change_pct": -2.78
+          },
+          "5d_before": {
+            "date": "2018-03-09",
+            "price": 66.9383,
+            "change_pct": 0.15
+          },
+          "5d_after": {
+            "date": "2018-03-23",
+            "price": 64.2607,
+            "change_pct": -4.15
+          },
+          "10d_before": {
+            "date": "2018-03-02",
+            "price": 66.0232,
+            "change_pct": 1.54
+          },
+          "10d_after": {
+            "date": "2018-04-03",
+            "price": 63.0406,
+            "change_pct": -5.97
+          },
+          "20d_before": {
+            "date": "2018-02-14",
+            "price": 66.3282,
+            "change_pct": 1.07
+          },
+          "20d_after": {
+            "date": "2018-04-18",
+            "price": 62.3627,
+            "change_pct": -6.98
+          }
+        }
+      }
+    }
+  ],
+  "private_public_matches": [],
+  "llm_assessments": [
+    {
+      "impact_level": "high",
+      "impact_score": 80,
+      "reasoning": "儘管輿論擔憂撤資，市場將其解讀為長實系高價出售資產，成功套現30億港元，優化資產配置及充實現金流，視為正面財務操作。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 30,
+      "comparable_events": "長實系過往亦多次透過出售物業套現，如2014年出售上海陸家嘴東方匯經中心，均被市場視為審慎的資產管理策略。",
+      "event_id": "evt_001",
+      "analyzed_at": "2026-03-31T08:39:25.282932"
+    },
+    {
+      "impact_level": "medium",
+      "impact_score": 60,
+      "reasoning": "長實系出售上海陸家嘴核心資產，規模達70億港元，市場或解讀為撤資中國信號，憂慮其內地業務前景及資產價值重估，導致股價承壓。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 30,
+      "comparable_events": "李嘉誠近年多次出售內地及香港資產，如百佳超市出售案（未果）、長園集團股權出售等，市場常將此類事件解讀為戰略性撤資，影響短期股價。",
+      "event_id": "evt_002",
+      "analyzed_at": "2026-03-31T08:39:33.210458"
+    },
+    {
+      "impact_level": "high",
+      "impact_score": 90,
+      "reasoning": "和記黃埔出售屈臣氏部分股權，套現巨額現金，大幅提升財務彈性並釋放資產價值，獲市場正面評價。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 60,
+      "comparable_events": "香港大型綜合企業出售核心或非核心資產以釋放價值或優化組合。",
+      "event_id": "evt_003",
+      "analyzed_at": "2026-03-31T08:39:41.871075"
+    },
+    {
+      "impact_level": "high",
+      "impact_score": 90,
+      "reasoning": "重組釋放價值，簡化架構，提升企業管治，獲市場正面解讀。",
+      "category_refined": "併購重組",
+      "expected_duration_days": 90,
+      "comparable_events": "大型企業重組分拆以釋放價值",
+      "event_id": "evt_004",
+      "analyzed_at": "2026-03-31T08:39:49.433806"
+    },
+    {
+      "impact_level": "medium",
+      "impact_score": 65,
+      "reasoning": "市場憂慮出售大型資產影響未來增長，股價短期受壓。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 30,
+      "comparable_events": "長和系過去多次大型資產出售，市場對此類戰略調整常有不同解讀，股價反應多受出售原因與資金再投資方向影響。",
+      "event_id": "evt_005",
+      "analyzed_at": "2026-03-31T08:40:02.804022"
+    },
+    {
+      "impact_level": "high",
+      "impact_score": 90,
+      "reasoning": "涉及長實出售逾300億港元地標資產中環中心，屬重大資產處置，對公司財務及業務策略影響深遠。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 60,
+      "comparable_events": "和記黃埔出售香港電燈集團；會德豐私有化等大型資產重組案例。",
+      "event_id": "evt_005b",
+      "analyzed_at": "2026-03-31T08:40:16.731161"
+    },
+    {
+      "impact_level": "medium",
+      "impact_score": 65,
+      "reasoning": "高價出售核心資產，市場憂慮集團撤資傾向，股價受壓。",
+      "category_refined": "資產處置",
+      "expected_duration_days": 90,
+      "comparable_events": "李嘉誠旗下集團過往亦多次出售大型非核心資產，如長實地產出售和記環球電訊。",
+      "event_id": "evt_006",
+      "analyzed_at": "2026-03-31T08:40:27.439116"
+    },
+    {
+      "impact_level": "high",
+      "impact_score": 75,
+      "reasoning": "李嘉誠退休引發市場對集團未來方向及領導能力的短期不確定性，導致相關股票下跌。",
+      "category_refined": "人事變動",
+      "expected_duration_days": 30,
+      "comparable_events": "例如恒基兆業李兆基退休，市場亦曾關注接班問題。",
+      "event_id": "evt_007",
+      "analyzed_at": "2026-03-31T08:40:37.217597"
+    }
+  ]
+}
