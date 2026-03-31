@@ -155,10 +155,11 @@ body {
   border-top: 1px solid var(--border); background: var(--panel-bg);
 }
 .event-list-panel {
-  max-height: 0; overflow: hidden; transition: max-height 0.3s;
-  background: var(--panel-bg); flex-shrink: 0;
+  display: none; background: var(--panel-bg); flex-shrink: 0;
+  height: 200px; overflow-y: auto;
+  border-top: 1px solid var(--border);
 }
-.event-list-panel.open { max-height: 220px; overflow-y: auto; }
+.event-list-panel.open { display: block; }
 .evt-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 .evt-table th {
   position: sticky; top: 0; background: var(--panel-bg);
@@ -397,7 +398,7 @@ body {
 </div>
 
 <!-- Overlay -->
-<div class="overlay-bg" id="overlayBg" onclick="closeSidePanel();document.getElementById('adminPanel').classList.remove('open')"></div>
+<div class="overlay-bg" id="overlayBg" onclick="closeAllPanels()"></div>
 
 <!-- Side Panel (Event Detail) -->
 <div class="side-panel" id="sidePanel">
@@ -775,6 +776,7 @@ function renderChart(stock) {
 
     chart.createOverlay({
       name: 'signalMarker',
+      lock: true,
       points: [{ timestamp: new Date(candle.date).getTime(), value: val }],
       extendData: { impact: evt.expected_impact, color: catInfo.color, event: evt },
       onClicked: () => openSidePanel(evt)
@@ -805,6 +807,8 @@ function toggleEvtList() {
   const p = document.getElementById('evtListPanel');
   p.classList.toggle('open');
   document.getElementById('evtListBtn').textContent = p.classList.contains('open') ? '收起' : '事件列表';
+  // Resize chart after panel toggle
+  setTimeout(() => { if (chart) chart.resize(); }, 50);
 }
 
 function buildEventList(stock) {
@@ -867,6 +871,14 @@ function openSidePanel(evt) {
 
 function closeSidePanel() {
   document.getElementById('sidePanel').classList.remove('open');
+  if (!document.getElementById('adminPanel').classList.contains('open')) {
+    document.getElementById('overlayBg').classList.remove('open');
+  }
+}
+
+function closeAllPanels() {
+  document.getElementById('sidePanel').classList.remove('open');
+  document.getElementById('adminPanel').classList.remove('open');
   document.getElementById('overlayBg').classList.remove('open');
 }
 
